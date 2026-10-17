@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Assets{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">Inventory</p>
+      <h1>Assets</h1>
+      <p class="muted">Search by tag, name, category, serial number, or location.</p>
+    </div>
+    <a class="button" href="{{ url_for('asset_create') }}">Add asset</a>
+  </div>
+  <form class="filters panel" method="get" action="{{ url_for('asset_list') }}">
+    <label class="grow">Search
+      <input type="search" name="q" value="{{ search }}" placeholder="e.g. LAP-001 or laptop">
+    </label>
+    <label>Status
+      <select name="status">
+        <option value="">All statuses</option>
+        {% for status in ("available", "allocated", "maintenance", "retired") %}
+          <option value="{{ status }}" {% if selected_status == status %}selected{% endif %}>{{ status|title }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <button class="button" type="submit">Apply filters</button>
+  </form>
+  {% if assets %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Asset tag</th><th>Name</th><th>Category</th><th>Location</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for asset in assets %}
+            <tr>
+              <td><a class="text-link" href="{{ url_for('asset_detail', asset_id=asset.id) }}">{{ asset.asset_tag }}</a></td>
+              <td>{{ asset.name }}</td><td>{{ asset.category }}</td>
+              <td>{{ asset.location or "—" }}</td>
+              <td><span class="status status-{{ asset.status }}">{{ asset.status|title }}</span></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <section class="empty-state panel">
+      <h2>No assets found</h2>
+      <p class="muted">{% if search or selected_status %}Try changing the search or filters.{% else %}Register the first asset to start your inventory.{% endif %}</p>
+      <a class="button" href="{{ url_for('asset_create') }}">Add asset</a>
+    </section>
+  {% endif %}
+{% endblock %}

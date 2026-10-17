@@ -59,19 +59,12 @@ The proposed design follows a **layered modular architecture**:
 
 A modular monolith is proposed for the initial implementation to keep deployment and maintenance manageable. The final technology stack should match the team's actual implementation.
 
-## Proposed Technology Stack
+## Technology Stack
 
-The documents describe the following options; select and confirm the tools used by the project before implementation or submission.
-
-- **Frontend:** HTML, CSS, JavaScript, or React
-- **Backend:** Python Flask/Django or Java Spring Boot
-- **Database:** PostgreSQL or MySQL
-- **API Format:** JSON over HTTPS
-- **API Testing:** Postman or an equivalent API client
-- **Diagrams:** PlantUML or draw.io
-- **Version Control:** Git
-
-> These are proposed options, not a claim that all listed technologies have already been implemented.
+- **Backend:** Python 3.12+ with Flask
+- **Database:** SQLite
+- **Frontend:** Server-rendered HTML templates and CSS
+- **Tests:** pytest and Flask's test client
 
 ## Core Data Entities
 
@@ -135,14 +128,28 @@ Test cases in the plan are proposed cases. Record actual results only after exec
 
 ## Getting Started
 
-The final installation commands depend on the backend, frontend, and database selected by the team. Before running the project:
+Use Python 3.12 or newer. From the repository root, create and activate a virtual environment, then install dependencies and start the local development server:
 
-1. Confirm the actual technology stack.
-2. Install the required runtime and database.
-3. Configure environment variables for database connectivity and any notification service.
-4. Initialize the database schema and create an administrator account securely.
-5. Start the backend and frontend using the commands appropriate to the chosen framework.
-6. Load synthetic sample data.
+```powershell
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+python app.py
+```
+
+Open <http://127.0.0.1:5000>. The SQLite database is created automatically at `instance/itams.sqlite3`.
+
+Run the automated tests locally before proposing changes:
+
+```powershell
+python -m pytest -q
+```
+
+## Current Implementation
+
+The initial application source supports asset registration and validation, inventory search and status filtering, an inventory dashboard, allocation and return history, and retirement of available assets. Automated tests cover these behaviors.
+
+Authentication and role-based permissions, asset editing, license and warranty management, maintenance scheduling, alerts, reporting, and audit history remain to be implemented. This prototype is for local development and evaluation only; do not expose it to an untrusted network or use it for real organizational data until authentication, authorization, and deployment security are added.
 7. Verify login, asset creation, allocation, expiry alerts, and reporting.
 
 Do not commit passwords, API keys, database credentials, or other secrets to version control.
@@ -156,7 +163,7 @@ Do not commit passwords, API keys, database credentials, or other secrets to ver
 
 ## Project Status
 
-This README describes the intended system and proposed design. Features should be marked as implemented only after they are built and tested. Technology choices, deployment commands, screenshots, and test results should be updated to reflect the actual project.
+The SRS, SAD, and test plan describe the broader target system. Keep implementation and test status up to date as additional features are developed.
 
 ## License
 

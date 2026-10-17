@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}{{ asset.name }}{% endblock %}
+{% block content %}
+  <p class="eyebrow"><a class="text-link" href="{{ url_for('asset_list') }}">Assets</a> / {{ asset.asset_tag }}</p>
+  <div class="page-heading">
+    <div>
+      <h1>{{ asset.name }}</h1>
+      <p class="muted">{{ asset.asset_tag }} · {{ asset.category }}</p>
+    </div>
+    <span class="status status-{{ asset.status }}">{{ asset.status|title }}</span>
+  </div>
+  <section class="panel">
+    <h2>Asset details</h2>
+    <dl class="details-grid">
+      <div><dt>Manufacturer</dt><dd>{{ asset.manufacturer or "—" }}</dd></div>
+      <div><dt>Model</dt><dd>{{ asset.model or "—" }}</dd></div>
+      <div><dt>Serial number</dt><dd>{{ asset.serial_number or "—" }}</dd></div>
+      <div><dt>Location</dt><dd>{{ asset.location or "—" }}</dd></div>
+      <div><dt>Purchase date</dt><dd>{{ asset.purchase_date or "—" }}</dd></div>
+    </dl>
+  </section>
+  {% if asset.status == "available" %}
+    <section class="panel">
+      <h2>Allocate this asset</h2>
+      <form class="inline-form" method="post" action="{{ url_for('asset_allocate', asset_id=asset.id) }}">
+        <label class="grow">Person, team, or department
+          <input name="assignee" required maxlength="120" placeholder="e.g. Alex Morgan or Finance">
+        </label>
+        <button class="button" type="submit">Allocate</button>
+      </form>
+    </section>
+  {% elif asset.status == "allocated" %}
+    <form method="post" action="{{ url_for('asset_return', asset_id=asset.id) }}">
+      <button class="button" type="submit">Record return</button>
+    </form>
+  {% endif %}
+  {% if asset.status == "available" %}
+    <form class="retire-form" method="post" action="{{ url_for('asset_retire', asset_id=asset.id) }}">
+      <button class="button button-danger" type="submit">Retire asset</button>
+    </form>
+  {% endif %}
+  <section class="panel">
+    <h2>Allocation history</h2>
+    {% if allocations %}
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Assignee</th><th>Allocated</th><th>Returned</th></tr></thead>
+          <tbody>
+            {% for allocation in allocations %}
+              <tr><td>{{ allocation.assignee }}</td><td>{{ allocation.allocated_at }}</td><td>{{ allocation.returned_at or "Current" }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="muted">This asset has no allocation history.</p>
+    {% endif %}
+  </section>
+{% endblock %}
