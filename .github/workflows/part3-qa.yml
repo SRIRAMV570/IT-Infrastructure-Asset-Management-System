@@ -1,0 +1,60 @@
+name: Part-3 QA and coverage reports
+
+on:
+  push:
+    branches:
+      - feature/sharvesh-s1-asset-lifecycle
+      - main
+    paths-ignore:
+      - "docs/Part3_Unit_Test_Report.md"
+      - "docs/Part3_System_Validation_Report.md"
+      - "docs/Part3_Code_Coverage_Report.md"
+      - "docs/Part3_Branch_Coverage_Report.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test dependencies
+        run: |
+          python -m pip install -r requirements.txt
+          python -m pip install "pytest-cov>=5,<8"
+      - name: Run all regression tests with branch coverage
+        id: tests
+        continue-on-error: true
+        run: |
+          mkdir -p docs
+          python -m pytest -q --junitxml=docs/part3_junit.xml \
+            --cov=app --cov=sprint1_asset_lifecycle --cov-branch \
+            --cov-report=term-missing --cov-report=json:docs/part3_coverage.json \
+            --cov-report=xml:docs/part3_coverage.xml
+      - name: Generate four evidence-backed reports
+        if: always()
+        run: |
+          python scripts/generate_part3_reports.py \
+            --junit docs/part3_junit.xml \
+            --coverage docs/part3_coverage.json \
+            --sha "${{ github.sha }}" \
+            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+      - name: Upload raw and readable test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: part3-testing-evidence
+          path: |
+            docs/Part3_*.md
+            docs/part3_junit.xml
+            docs/part3_coverage.json
+            docs/part3_coverage.xml
+          if-no-files-found: warn
+      - name: Fail job if automated tests failed
+        if: steps.tests.outcome == 'failure'
+        run: exit 1
