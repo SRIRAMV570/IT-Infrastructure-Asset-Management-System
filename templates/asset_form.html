@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Add asset{% endblock %}
+{% block content %}
+  <p class="eyebrow"><a class="text-link" href="{{ url_for('asset_list') }}">Assets</a> / New</p>
+  <h1>Register an asset</h1>
+  <p class="muted">Asset tag, name, and category are required. Tags and serial numbers must be unique.</p>
+  <form class="panel form-grid" method="post">
+    <label>Asset tag <span class="required">*</span>
+      <input name="asset_tag" value="{{ asset.get('asset_tag', '') }}" required maxlength="80">
+    </label>
+    <label>Asset name <span class="required">*</span>
+      <input name="name" value="{{ asset.get('name', '') }}" required maxlength="120">
+    </label>
+    <label>Category <span class="required">*</span>
+      <input name="category" value="{{ asset.get('category', '') }}" required maxlength="80" placeholder="Laptop, monitor, software">
+    </label>
+    <label>Manufacturer
+      <input name="manufacturer" value="{{ asset.get('manufacturer', '') }}" maxlength="100">
+    </label>
+    <label>Model
+      <input name="model" value="{{ asset.get('model', '') }}" maxlength="100">
+    </label>
+    <label>Serial number
+      <input name="serial_number" value="{{ asset.get('serial_number', '') }}" maxlength="120">
+    </label>
+    <label>Location
+      <input name="location" value="{{ asset.get('location', '') }}" maxlength="120">
+    </label>
+    <label>Purchase date
+      <input type="date" name="purchase_date" value="{{ asset.get('purchase_date', '') }}">
+    </label>
+    <div class="form-actions">
+      <a class="button button-secondary" href="{{ url_for('asset_list') }}">Cancel</a>
+      <button class="button" type="submit">Save asset</button>
+    </div>
+  </form>
+{% endblock %}
