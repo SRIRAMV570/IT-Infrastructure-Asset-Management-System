@@ -430,6 +430,13 @@ def create_app(test_config=None):
             flash("Asset retired.", "success")
         return redirect(url_for("asset_detail", asset_id=asset_id))
 
+    # S1-02: register lifecycle operations with the shared authorization policy.
+    from sprint1_asset_lifecycle import register_asset_lifecycle
+    register_asset_lifecycle(
+        app, get_db, get_asset_or_404, asset_form_values,
+        validate_asset, roles_required,
+    )
+
     return app
 
 
