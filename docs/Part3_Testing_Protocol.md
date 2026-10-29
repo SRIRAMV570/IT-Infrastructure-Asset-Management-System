@@ -10,7 +10,7 @@
 | System Validation Report | `Part3_System_Validation_Report.md` (automated evidence + open UAT gaps) |
 | Code Coverage Report | `Part3_Code_Coverage_Report.md` (measured statement coverage) |
 | Branch Coverage Report | `Part3_Branch_Coverage_Report.md` (measured control-flow branches) |
-| Upload all reports to docs | Part-3 QA workflow commits the four reports under `docs/` on the S1-02 branch (if Actions write access allows); also uploads downloadable workflow artifacts |
+| Upload all reports to docs | Four baseline reports are committed under `docs/` in the Part-3 PR; the QA workflow uploads fresh downloadable evidence artifacts for every run |
 | Optional Sprint-3 | Not started; only create if genuine Sprint-1/2 spillover is agreed |
 
 ## Run window
@@ -30,7 +30,7 @@ python scripts/generate_part3_reports.py \
   --junit docs/part3_junit.xml --coverage docs/part3_coverage.json
 ```
 
-Generated JUnit and coverage machine files are CI artifacts, not source-controlled; the four human-readable Markdown reports are committed to `docs/`.
+Generated JUnit and coverage machine files are CI artifacts, not source-controlled. The four human-readable Markdown reports are already committed to `docs/`. For any later run, download its QA artifact, update the four report Markdown files, and submit the change through a reviewed pull request; the workflow intentionally does not push bot commits to protected branches.
 
 ## Manual validation for 2–6 November
 
