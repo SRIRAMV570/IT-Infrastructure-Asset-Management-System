@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feature/sharvesh-s1-asset-lifecycle
+      - main
     paths-ignore:
       - "docs/Part3_Unit_Test_Report.md"
       - "docs/Part3_System_Validation_Report.md"
@@ -55,7 +56,7 @@ jobs:
             docs/part3_coverage.xml
           if-no-files-found: warn
       - name: Commit reports into docs on the feature branch
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/feature/sharvesh-s1-asset-lifecycle'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -64,7 +65,7 @@ jobs:
             docs/Part3_Code_Coverage_Report.md \
             docs/Part3_Branch_Coverage_Report.md
           if ! git diff --cached --quiet; then
-            git commit -m "docs: publish Part-3 testing reports [skip ci]"
+            git commit -m "docs: publish Part-3 testing reports"
             git push origin HEAD:feature/sharvesh-s1-asset-lifecycle
           fi
       - name: Fail job if automated tests failed
