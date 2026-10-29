@@ -5,6 +5,7 @@
   <h1>Register an asset</h1>
   <p class="muted">Asset tag, name, and category are required. Tags and serial numbers must be unique.</p>
   <form class="panel form-grid" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <label>Asset tag <span class="required">*</span>
       <input name="asset_tag" value="{{ asset.get('asset_tag', '') }}" required maxlength="80">
     </label>

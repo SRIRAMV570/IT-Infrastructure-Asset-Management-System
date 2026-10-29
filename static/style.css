@@ -73,9 +73,18 @@ dd { margin: 6px 0 0; font-weight: 600; }
 .empty-state { text-align: center; padding: 44px 20px; }
 .empty-state h2 { margin-bottom: 8px; }
 .retire-form { margin: 18px 0; }
+.logout-form { display: inline-flex; margin: 0; }
+.login-container { display: grid; min-height: 100vh; place-items: center; padding: 24px; }
+.login-panel { width: min(440px, 100%); padding: 34px; }
+.login-panel .brand { display: inline-block; margin-bottom: 20px; }
+.login-panel h1 { margin-bottom: 22px; }
+.login-form { display: grid; gap: 18px; margin-top: 22px; }
+.login-form .button { width: 100%; margin-top: 4px; }
+code { overflow-wrap: anywhere; }
 @media (max-width: 740px) {
   .topbar { padding: 0 20px; }
   nav { gap: 12px; }
+  nav > .muted { display: none; }
   .container { margin-top: 26px; }
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
   .filters, .inline-form { align-items: stretch; flex-direction: column; }

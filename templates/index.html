@@ -7,7 +7,9 @@
       <h1>Asset dashboard</h1>
       <p class="muted">A quick view of the organization's IT inventory.</p>
     </div>
-    <a class="button" href="{{ url_for('asset_create') }}">Register an asset</a>
+    {% if current_user.role in ("admin", "asset_manager") %}
+      <a class="button" href="{{ url_for('asset_create') }}">Register an asset</a>
+    {% endif %}
   </div>
   <section class="stat-grid" aria-label="Asset totals">
     <a class="stat-card" href="{{ url_for('asset_list') }}">

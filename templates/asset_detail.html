@@ -19,23 +19,26 @@
       <div><dt>Purchase date</dt><dd>{{ asset.purchase_date or "—" }}</dd></div>
     </dl>
   </section>
-  {% if asset.status == "available" %}
+  {% if asset.status == "available" and current_user.role in ("admin", "asset_manager") %}
     <section class="panel">
       <h2>Allocate this asset</h2>
       <form class="inline-form" method="post" action="{{ url_for('asset_allocate', asset_id=asset.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <label class="grow">Person, team, or department
           <input name="assignee" required maxlength="120" placeholder="e.g. Alex Morgan or Finance">
         </label>
         <button class="button" type="submit">Allocate</button>
       </form>
     </section>
-  {% elif asset.status == "allocated" %}
+  {% elif asset.status == "allocated" and current_user.role in ("admin", "asset_manager") %}
     <form method="post" action="{{ url_for('asset_return', asset_id=asset.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
       <button class="button" type="submit">Record return</button>
     </form>
   {% endif %}
-  {% if asset.status == "available" %}
+  {% if asset.status == "available" and current_user.role in ("admin", "asset_manager") %}
     <form class="retire-form" method="post" action="{{ url_for('asset_retire', asset_id=asset.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
       <button class="button button-danger" type="submit">Retire asset</button>
     </form>
   {% endif %}
