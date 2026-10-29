@@ -1,9 +1,9 @@
 # Part-3 — System Validation Report
 
 **Project:** IT Infrastructure & Asset Management System (ITAMS)  
-**Evidence generated (UTC):** 2026-10-29 06:22:55 UTC  
-**Source commit:** `90cfc4010c614775e1603c86c44d330150afcac9`  
-**CI execution:** https://github.com/SRIRAMV570/IT-Infrastructure-Asset-Management-System/actions/runs/40828822838  
+**Evidence generated (UTC):** 2026-10-29 06:26:39 UTC  
+**Source commit:** `20cd695519067ed7e5a3841f4b1b42731507d81a`  
+**CI execution:** https://github.com/SRIRAMV570/IT-Infrastructure-Asset-Management-System/actions/runs/40829198896  
 **Basis:** actual pytest JUnit XML and pytest-cov JSON from the same run.
 
 **Automated validation status:** PASS for exercised routes and functions. **Full system sign-off: NOT COMPLETE.**
