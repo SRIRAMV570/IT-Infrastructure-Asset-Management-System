@@ -1,10 +1,14 @@
-"""S1-02 asset lifecycle extension. S1-01 owns authentication; S1-03 owns auditing."""
+"""S1-02 asset lifecycle extension. S1-01 authorization and CSRF are enforced; S1-03 owns auditing."""
 import sqlite3
 from flask import abort, flash, redirect, render_template, request, url_for
 
 
-def register_asset_lifecycle(app, get_db, get_asset_or_404, asset_form_values, validate_asset):
+def register_asset_lifecycle(
+    app, get_db, get_asset_or_404, asset_form_values,
+    validate_asset, roles_required,
+):
     @app.route("/assets/<int:asset_id>/edit", methods=("GET", "POST"))
+    @roles_required("admin", "asset_manager")
     def asset_edit(asset_id):
         asset = get_asset_or_404(asset_id)
         if asset["status"] == "retired":
@@ -42,6 +46,7 @@ def register_asset_lifecycle(app, get_db, get_asset_or_404, asset_form_values, v
         return redirect(url_for("asset_detail", asset_id=asset_id))
 
     @app.post("/assets/<int:asset_id>/transfer")
+    @roles_required("admin", "asset_manager")
     def asset_transfer(asset_id):
         # Validate before modifying any existing holder.
         assignee = request.form.get("assignee", "").strip()

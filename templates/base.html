@@ -12,7 +12,16 @@
     <nav aria-label="Main navigation">
       <a href="{{ url_for('index') }}">Dashboard</a>
       <a href="{{ url_for('asset_list') }}">Assets</a>
-      <a class="button button-small" href="{{ url_for('asset_create') }}">Add asset</a>
+      {% if current_user and current_user.role in ("admin", "asset_manager") %}
+        <a class="button button-small" href="{{ url_for('asset_create') }}">Add asset</a>
+      {% endif %}
+      {% if current_user %}
+        <span class="muted">{{ current_user.username }} · {{ current_user.role|replace("_", " ")|title }}</span>
+        <form class="logout-form" method="post" action="{{ url_for('logout') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="button button-secondary button-small" type="submit">Sign out</button>
+        </form>
+      {% endif %}
     </nav>
   </header>
   <main class="container">

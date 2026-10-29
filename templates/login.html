@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in | ITAMS</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="login-container">
+    <section class="panel login-panel">
+      <a class="brand" href="{{ url_for('login') }}">ITAMS</a>
+      <p class="eyebrow">IT Asset Management</p>
+      <h1>Sign in</h1>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="messages" aria-live="polite">
+            {% for category, message in messages %}
+              <p class="message {{ category }}">{{ message }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      {% if account_count == 0 %}
+        <p class="message error">
+          No accounts are configured. Create the first administrator from the
+          project folder with
+          <code>flask --app app:create_app create-admin</code>.
+        </p>
+      {% endif %}
+      <form class="login-form" method="post" action="{{ url_for('login') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label for="username">Username
+          <input id="username" name="username" required autocomplete="username" autofocus>
+        </label>
+        <label for="password">Password
+          <input id="password" type="password" name="password" required autocomplete="current-password">
+        </label>
+        <button class="button" type="submit">Sign in</button>
+      </form>
+    </section>
+  </main>
+</body>
+</html>
