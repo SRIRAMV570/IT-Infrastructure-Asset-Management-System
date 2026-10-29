@@ -19,6 +19,9 @@
       <div><dt>Purchase date</dt><dd>{{ asset.purchase_date or "—" }}</dd></div>
     </dl>
   </section>
+  {% if asset.status != "retired" and current_user.role in ("admin", "asset_manager") %}
+    <p><a class="button button-secondary" href="{{ url_for('asset_edit', asset_id=asset.id) }}">Edit asset</a></p>
+  {% endif %}
   {% if asset.status == "available" and current_user.role in ("admin", "asset_manager") %}
     <section class="panel">
       <h2>Allocate this asset</h2>
@@ -31,6 +34,16 @@
       </form>
     </section>
   {% elif asset.status == "allocated" and current_user.role in ("admin", "asset_manager") %}
+    <section class="panel">
+      <h2>Transfer asset</h2>
+      <form class="inline-form" method="post" action="{{ url_for('asset_transfer', asset_id=asset.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label class="grow">New holder
+          <input name="assignee" required maxlength="120" placeholder="Person, team, or department">
+        </label>
+        <button class="button" type="submit">Transfer</button>
+      </form>
+    </section>
     <form method="post" action="{{ url_for('asset_return', asset_id=asset.id) }}">
       <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
       <button class="button" type="submit">Record return</button>
