@@ -7,7 +7,9 @@
       <h1>Assets</h1>
       <p class="muted">Search by tag, name, category, serial number, or location.</p>
     </div>
-    <a class="button" href="{{ url_for('asset_create') }}">Add asset</a>
+    {% if current_user.role in ("admin", "asset_manager") %}
+      <a class="button" href="{{ url_for('asset_create') }}">Add asset</a>
+    {% endif %}
   </div>
   <form class="filters panel" method="get" action="{{ url_for('asset_list') }}">
     <label class="grow">Search
@@ -43,7 +45,9 @@
     <section class="empty-state panel">
       <h2>No assets found</h2>
       <p class="muted">{% if search or selected_status %}Try changing the search or filters.{% else %}Register the first asset to start your inventory.{% endif %}</p>
-      <a class="button" href="{{ url_for('asset_create') }}">Add asset</a>
+      {% if current_user.role in ("admin", "asset_manager") %}
+        <a class="button" href="{{ url_for('asset_create') }}">Add asset</a>
+      {% endif %}
     </section>
   {% endif %}
 {% endblock %}
