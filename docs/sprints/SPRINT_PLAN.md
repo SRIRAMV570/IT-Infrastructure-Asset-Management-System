@@ -17,11 +17,11 @@ Story points use the Fibonacci scale. These are planning estimates, not measured
 
 ## Existing work to bring into the project
 
-The asset-inventory MVP and GitHub Actions pytest workflow are already pushed to `feature/ci-tests` (which includes `feature/asset-inventory-mvp`). Before Sprint 1 starts, open one PR from `feature/ci-tests` to `main`, have a teammate review it, confirm CI passes, and merge it. This provides the team a common baseline; do not copy these features into new backlog cards.
+The asset-inventory MVP and GitHub Actions pytest workflow are already pushed to `feature/ci-tests` (which includes `feature/asset-inventory-mvp`). At Sprint 1 kickoff, open one PR from `feature/ci-tests` to `main`, have a teammate review it, confirm CI passes, and merge it before building on the MVP. This provides the team a common baseline; do not copy these features into new backlog cards.
 
 ## Sprint 1 — Working product
 
-**Dates:** November 2–6, 2026
+**Dates:** October 29–November 4, 2026 (five working days)
 **Goal:** Deliver a protected, auditable asset-management product that the team can run and demonstrate.
 **Total:** 23 points
 
@@ -45,7 +45,7 @@ The asset-inventory MVP and GitHub Actions pytest workflow are already pushed to
 
 ## Sprint 2 — Complete, document, demo, and freeze
 
-**Dates:** November 9–13, 2026
+**Dates:** November 5–11, 2026 (five working days)
 **Goal:** Complete the high-priority operational features, verify quality, finish documentation, and freeze a reproducible demo build.
 **Total:** 28 points
 
@@ -83,7 +83,7 @@ The asset-inventory MVP and GitHub Actions pytest workflow are already pushed to
 Create a repository-linked GitHub Project named **ITAMS Delivery Plan** and add fields:
 
 - **Status:** Backlog, Ready, In Progress, In Review, Done
-- **Sprint:** Sprint 1 (Nov 2–6), Sprint 2 (Nov 9–13)
+- **Sprint:** Sprint 1 (Oct 29–Nov 4), Sprint 2 (Nov 5–11)
 - **Story points:** Number
 - **Priority:** P0, P1, P2
 
