@@ -57,7 +57,7 @@ The proposed design follows a **layered modular architecture**:
 5. **Relational Database:** Stores users, roles, assets, allocations, licenses, warranties, maintenance records, alerts, and audit events.
 6. **Optional Notification Service:** Sends email alerts if configured; in-app alerts remain part of the intended system.
 
-A modular monolith is proposed for the initial implementation to keep deployment and maintenance manageable. The final technology stack should match the team's actual implementation.
+The application is implemented as a modular Flask monolith to keep deployment and maintenance manageable.
 
 ## Technology Stack
 
@@ -65,6 +65,25 @@ A modular monolith is proposed for the initial implementation to keep deployment
 - **Database:** SQLite
 - **Frontend:** Server-rendered HTML templates and CSS
 - **Tests:** pytest and Flask's test client
+
+## Authentication and roles
+
+All application pages require a signed-in user. Accounts are created from the command line; there is no public registration page. Create the first administrator from the repository root:
+
+```powershell
+flask --app app:create_app create-admin --username admin
+```
+
+The CLI prompts for a password and confirmation. Passwords must be at least 12 characters and are stored as salted hashes. After the first administrator is created, add accounts using one of these roles:
+
+```powershell
+flask --app app:create_app create-user --username assetmanager --role asset_manager
+flask --app app:create_app create-user --username auditor1 --role auditor
+```
+
+`admin` and `asset_manager` can register and manage assets, allocate, return, and retire them. `department_manager`, `employee`, and `auditor` have read-only dashboard and inventory access. Authorization is enforced on the server, not just by hiding controls in the UI. Mutating forms, including login, also require a CSRF token.
+
+For local development, the session signing key is generated once and saved in the ignored `instance/.flask_secret_key` file. For deployment, set a strong `FLASK_SECRET_KEY` through the hosting environment, serve the app only over HTTPS, and set `SESSION_COOKIE_SECURE=1`. Do not commit the key or use the development server for public deployment.
 
 ## Core Data Entities
 
@@ -128,16 +147,17 @@ Test cases in the plan are proposed cases. Record actual results only after exec
 
 ## Getting Started
 
-Use Python 3.12 or newer. From the repository root, create and activate a virtual environment, then install dependencies and start the local development server:
+Use Python 3.12 or newer. From the repository root, create and activate a virtual environment, install dependencies, create the initial administrator, and start the local development server:
 
 ```powershell
 py -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
+flask --app app:create_app create-admin --username admin
 python app.py
 ```
 
-Open <http://127.0.0.1:5000>. The SQLite database is created automatically at `instance/itams.sqlite3`.
+Open <http://127.0.0.1:5000> and sign in with the administrator account you created. The SQLite database is created automatically at `instance/itams.sqlite3`.
 
 Run the automated tests locally before proposing changes:
 
