@@ -4,7 +4,7 @@ Create one GitHub issue per section, then add it to **ITAMS Delivery Plan** and 
 
 ## S1-01 — Add authentication and server-side role-based access
 
-- **Sprint:** Sprint 1 (Nov 2–6, 2026)
+- **Sprint:** Sprint 1 (Oct 29–Nov 4, 2026)
 - **Assignee:** @SRIRAMV570
 - **Story points:** 8
 - **Priority:** P0
@@ -20,7 +20,7 @@ Create one GitHub issue per section, then add it to **ITAMS Delivery Plan** and 
 
 ## S1-02 — Complete asset editing, reassignment, transfer, and lifecycle history
 
-- **Sprint:** Sprint 1 (Nov 2–6, 2026)
+- **Sprint:** Sprint 1 (Oct 29–Nov 4, 2026)
 - **Assignee:** @SharveshK1228
 - **Story points:** 5
 - **Priority:** P0
@@ -36,7 +36,7 @@ Create one GitHub issue per section, then add it to **ITAMS Delivery Plan** and 
 
 ## S1-03 — Record audit events for important asset and allocation changes
 
-- **Sprint:** Sprint 1 (Nov 2–6, 2026)
+- **Sprint:** Sprint 1 (Oct 29–Nov 4, 2026)
 - **Assignee:** @Shreyanganesh
 - **Story points:** 5
 - **Priority:** P0
@@ -51,7 +51,7 @@ Create one GitHub issue per section, then add it to **ITAMS Delivery Plan** and 
 
 ## S1-04 — Improve dashboard summaries and keyboard-accessible form feedback
 
-- **Sprint:** Sprint 1 (Nov 2–6, 2026)
+- **Sprint:** Sprint 1 (Oct 29–Nov 4, 2026)
 - **Assignee:** @yashwanth00000
 - **Story points:** 3
 - **Priority:** P1
@@ -66,7 +66,7 @@ Create one GitHub issue per section, then add it to **ITAMS Delivery Plan** and 
 
 ## S1-05 — Validate working increment and prepare one-minute sprint demo
 
-- **Sprint:** Sprint 1 (Nov 2–6, 2026)
+- **Sprint:** Sprint 1 (Oct 29–Nov 4, 2026)
 - **Assignee:** @yashwanth00000
 - **Story points:** 2
 - **Priority:** P1
@@ -81,7 +81,7 @@ Create one GitHub issue per section, then add it to **ITAMS Delivery Plan** and 
 
 ## S2-01 — Track software licenses, entitlement compliance, and warranties
 
-- **Sprint:** Sprint 2 (Nov 9–13, 2026)
+- **Sprint:** Sprint 2 (Nov 5–11, 2026)
 - **Assignee:** @SharveshK1228
 - **Story points:** 5
 - **Priority:** P0
@@ -97,7 +97,7 @@ Create one GitHub issue per section, then add it to **ITAMS Delivery Plan** and 
 
 ## S2-02 — Schedule maintenance and preserve service history
 
-- **Sprint:** Sprint 2 (Nov 9–13, 2026)
+- **Sprint:** Sprint 2 (Nov 5–11, 2026)
 - **Assignee:** @yashwanth00000
 - **Story points:** 5
 - **Priority:** P0
@@ -112,7 +112,7 @@ Create one GitHub issue per section, then add it to **ITAMS Delivery Plan** and 
 
 ## S2-03 — Generate, assign, and resolve expiry and maintenance alerts
 
-- **Sprint:** Sprint 2 (Nov 9–13, 2026)
+- **Sprint:** Sprint 2 (Nov 5–11, 2026)
 - **Assignee:** @Shreyanganesh
 - **Story points:** 5
 - **Priority:** P1
@@ -128,7 +128,7 @@ Create one GitHub issue per section, then add it to **ITAMS Delivery Plan** and 
 
 ## S2-04 — Add reports, CSV export, and validated CSV import
 
-- **Sprint:** Sprint 2 (Nov 9–13, 2026)
+- **Sprint:** Sprint 2 (Nov 5–11, 2026)
 - **Assignee:** @SRIRAMV570
 - **Story points:** 8
 - **Priority:** P1
@@ -144,7 +144,7 @@ Create one GitHub issue per section, then add it to **ITAMS Delivery Plan** and 
 
 ## S2-05 — Run security, performance, compatibility, and backup/restore checks
 
-- **Sprint:** Sprint 2 (Nov 9–13, 2026)
+- **Sprint:** Sprint 2 (Nov 5–11, 2026)
 - **Assignee:** @SharveshK1228
 - **Story points:** 3
 - **Priority:** P0
@@ -160,7 +160,7 @@ Create one GitHub issue per section, then add it to **ITAMS Delivery Plan** and 
 
 ## S2-06 — Finish RTM and setup guide, record two-minute demo, freeze release
 
-- **Sprint:** Sprint 2 (Nov 9–13, 2026)
+- **Sprint:** Sprint 2 (Nov 5–11, 2026)
 - **Assignee:** @yashwanth00000
 - **Story points:** 2
 - **Priority:** P1
