@@ -12,8 +12,8 @@ permissions:
   contents: read
 
 jobs:
-  pytest:
-    name: Python tests
+  test:
+    name: test
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
