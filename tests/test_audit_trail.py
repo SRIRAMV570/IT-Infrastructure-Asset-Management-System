@@ -1,10 +1,78 @@
 """S1-03 audit trail behavior and integrity tests."""
 import json
+import re
 import sqlite3
+
 import pytest
 
-from app import get_db
-from test_app import add_asset, post_form
+from app import create_app, get_db
+
+ADMIN_PASSWORD = "CorrectHorseBatteryStaple42!"
+
+
+@pytest.fixture()
+def app(tmp_path):
+    application = create_app({
+        "TESTING": True,
+        "DATABASE": str(tmp_path / "audit.sqlite3"),
+        "SECRET_KEY": "test-audit-secret",
+    })
+    result = application.test_cli_runner().invoke(
+        args=["create-admin", "--username", "admin"],
+        input=f"{ADMIN_PASSWORD}\n{ADMIN_PASSWORD}\n",
+    )
+    assert result.exit_code == 0, result.output
+    return application
+
+
+def csrf_token(client, path="/"):
+    response = client.get(path)
+    match = re.search(
+        r'name="csrf_token" value="([^"]+)"', response.get_data(as_text=True)
+    )
+    assert match, f"CSRF token missing from {path}"
+    return match.group(1)
+
+
+def login(client, username="admin", password=ADMIN_PASSWORD):
+    response = client.post(
+        "/login",
+        data={
+            "csrf_token": csrf_token(client, "/login"),
+            "username": username,
+            "password": password,
+        },
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    return response
+
+
+@pytest.fixture()
+def client(app):
+    test_client = app.test_client()
+    login(test_client)
+    return test_client
+
+
+def post_form(client, path, values=None, follow_redirects=True):
+    data = dict(values or {})
+    data["csrf_token"] = csrf_token(client)
+    return client.post(path, data=data, follow_redirects=follow_redirects)
+
+
+def add_asset(client, **overrides):
+    values = {
+        "asset_tag": "LAP-001",
+        "name": "Developer laptop",
+        "category": "Laptop",
+        "manufacturer": "Example",
+        "model": "Model A",
+        "serial_number": "SER-001",
+        "location": "Room 12",
+    }
+    values.update(overrides)
+    return post_form(client, "/assets/new", values)
 
 
 def audit_rows(app):
@@ -25,17 +93,19 @@ def test_successful_asset_lifecycle_writes_audit_events(app, client):
     post_form(client, f"/assets/{asset_id}/return")
     post_form(client, f"/assets/{asset_id}/retire")
 
-    actions = [row["action"] for row in audit_rows(app)]
-    assert actions == [
+    rows = audit_rows(app)
+    assert [row["action"] for row in rows] == [
         "asset.created", "asset.allocated", "asset.transferred",
         "asset.returned", "asset.retired",
     ]
-    assert all(row["actor_username"] == "admin" for row in audit_rows(app))
+    assert all(row["actor_id"] == 1 and row["actor_username"] == "admin"
+               for row in rows)
     assert all(row["target_type"] == "asset" and row["target_id"] == asset_id
-               for row in audit_rows(app))
-    assert json.loads(audit_rows(app)[2]["details"]) == {
+               for row in rows)
+    assert json.loads(rows[2]["details"]) == {
         "from_assignee": "Alice", "to_assignee": "Bob"
     }
+    assert json.loads(rows[3]["details"]) == {"assignee": "Bob"}
 
 
 def test_asset_edit_records_only_changed_fields(app, client):
