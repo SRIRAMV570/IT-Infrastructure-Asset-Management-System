@@ -127,6 +127,7 @@ def test_invalid_purchase_date_is_rejected(client):
 
     assert response.status_code == 400
     assert b"Purchase date must be a valid date." in response.data
+    assert b'id="purchase-date-error" role="alert"' in response.data
 
 
 def test_asset_search_and_status_filter(client):
@@ -358,11 +359,11 @@ def test_dashboard_summarizes_asset_categories(client):
     assert response.status_code == 200
     assert b"Asset categories" in response.data
     assert re.search(
-        rb'<span>Laptop</span>\\s*<strong>2</strong>',
+        rb'<span>Laptop</span>\s*<strong>2</strong>',
         response.data,
     )
     assert re.search(
-        rb'<span>Monitor</span>\\s*<strong>1</strong>',
+        rb'<span>Monitor</span>\s*<strong>1</strong>',
         response.data,
     )
     assert b'href="/assets?q=Laptop"' in response.data
