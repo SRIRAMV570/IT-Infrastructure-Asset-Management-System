@@ -5,6 +5,8 @@ import sqlite3
 from functools import wraps
 from pathlib import Path
 
+import json
+
 import click
 from flask import (
     Flask,
@@ -76,6 +78,33 @@ CREATE TABLE IF NOT EXISTS allocations (
 
 CREATE UNIQUE INDEX IF NOT EXISTS one_active_allocation_per_asset
     ON allocations(asset_id) WHERE returned_at IS NULL;
+
+CREATE TABLE IF NOT EXISTS audit_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    actor_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    actor_username TEXT NOT NULL,
+    action TEXT NOT NULL,
+    target_type TEXT NOT NULL,
+    target_id INTEGER NOT NULL,
+    details TEXT NOT NULL DEFAULT '{}',
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS audit_events_target
+    ON audit_events(target_type, target_id, id DESC);
+CREATE INDEX IF NOT EXISTS audit_events_created
+    ON audit_events(created_at DESC, id DESC);
+
+CREATE TRIGGER IF NOT EXISTS audit_events_no_update
+BEFORE UPDATE ON audit_events
+BEGIN
+    SELECT RAISE(ABORT, 'audit events are immutable');
+END;
+CREATE TRIGGER IF NOT EXISTS audit_events_no_delete
+BEFORE DELETE ON audit_events
+BEGIN
+    SELECT RAISE(ABORT, 'audit events are immutable');
+END;
 """
 
 
@@ -319,6 +348,10 @@ def create_app(test_config=None):
                         )
                     ),
                 )
+                record_audit_event(
+                    get_db(), "asset.created", "asset", cursor.lastrowid,
+                    {"asset_tag": values["asset_tag"], "name": values["name"]},
+                )
                 get_db().commit()
             except sqlite3.IntegrityError as error:
                 get_db().rollback()
@@ -349,8 +382,15 @@ def create_app(test_config=None):
             """,
             (asset_id,),
         ).fetchall()
+        audit_events = get_db().execute(
+            """SELECT actor_username, action, details, created_at
+               FROM audit_events WHERE target_type='asset' AND target_id=?
+               ORDER BY id DESC""",
+            (asset_id,),
+        ).fetchall()
         return render_template(
-            "asset_detail.html", asset=asset, allocations=allocations
+            "asset_detail.html", asset=asset, allocations=allocations,
+            audit_events=audit_events,
         )
 
     @app.post("/assets/<int:asset_id>/allocate")
@@ -377,6 +417,10 @@ def create_app(test_config=None):
                     "INSERT INTO allocations (asset_id, assignee) VALUES (?, ?)",
                     (asset_id, assignee),
                 )
+                record_audit_event(
+                    db, "asset.allocated", "asset", asset_id,
+                    {"assignee": assignee},
+                )
                 db.commit()
                 flash("Asset allocated.", "success")
         return redirect(url_for("asset_detail", asset_id=asset_id))
@@ -397,6 +441,10 @@ def create_app(test_config=None):
             db.rollback()
             flash("Only allocated assets can be returned.", "error")
         else:
+            active_allocation = db.execute(
+                "SELECT assignee FROM allocations WHERE asset_id=? AND returned_at IS NULL",
+                (asset_id,),
+            ).fetchone()
             allocation = db.execute(
                 """
                 UPDATE allocations SET returned_at = CURRENT_TIMESTAMP
@@ -407,6 +455,10 @@ def create_app(test_config=None):
             if allocation.rowcount != 1:
                 db.rollback()
                 abort(409, description="The asset has no active allocation record.")
+            record_audit_event(
+                db, "asset.returned", "asset", asset_id,
+                {"assignee": active_allocation["assignee"]},
+            )
             db.commit()
             flash("Asset returned and made available.", "success")
         return redirect(url_for("asset_detail", asset_id=asset_id))
@@ -426,6 +478,10 @@ def create_app(test_config=None):
             get_db().rollback()
             flash("Only available assets can be retired.", "error")
         else:
+            record_audit_event(
+                get_db(), "asset.retired", "asset", asset_id,
+                {"previous_status": "available", "status": "retired"},
+            )
             get_db().commit()
             flash("Asset retired.", "success")
         return redirect(url_for("asset_detail", asset_id=asset_id))
@@ -448,6 +504,30 @@ def get_db():
         g.db.row_factory = sqlite3.Row
         g.db.execute("PRAGMA foreign_keys = ON")
     return g.db
+
+
+def record_audit_event(db, action, target_type, target_id, details=None):
+    """Append an immutable audit event for the authenticated actor."""
+    actor = getattr(g, "user", None)
+    if actor is None:
+        raise RuntimeError("Audit events require an authenticated actor.")
+    db.execute(
+        """INSERT INTO audit_events
+           (actor_id, actor_username, action, target_type, target_id, details)
+           VALUES (?, ?, ?, ?, ?, ?)""",
+        (
+            actor["id"], actor["username"], action, target_type, target_id,
+            json.dumps(details or {}, sort_keys=True, separators=(",", ":")),
+        ),
+    )
+
+
+def get_db_audit_events(asset_id):
+    return get_db().execute(
+        """SELECT actor_username, action, details, created_at
+           FROM audit_events WHERE target_type='asset' AND target_id=?
+           ORDER BY id DESC""", (asset_id,)
+    ).fetchall()
 
 
 def get_asset_or_404(asset_id):
