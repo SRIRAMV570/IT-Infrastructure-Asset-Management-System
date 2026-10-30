@@ -118,7 +118,7 @@ Expiry thresholds and notification channels should be configured according to pr
 - Store passwords using an appropriate salted password-hashing algorithm.
 - Validate inputs and use parameterized database operations.
 - Do not log passwords, session tokens, or full license secrets.
-- Record important changes in an audit trail.
+- Record asset creation, edits, allocation, transfer, return, and retirement in an append-only audit trail. Audit records include the actor, timestamp, action, affected asset, and safe change details; passwords and secrets are excluded.
 - Use synthetic data for development and testing; avoid real credentials or confidential organizational information.
 
 ## Documentation
@@ -188,3 +188,8 @@ The SRS, SAD, and test plan describe the broader target system. Keep implementat
 ## License
 
 No open-source license has been specified for this project. Add a license only after the project team decides how the code may be used and redistributed.
+
+
+## Asset audit trail (S1-03)
+
+Every successful asset lifecycle mutation appends an audit event in the same SQLite transaction as the underlying change. Events retain the actor ID and username, UTC/database timestamp, action, target type and ID, and JSON change details. Invalid requests and failed state transitions do not create events. SQLite triggers reject ordinary UPDATE and DELETE statements against audit records. Asset detail pages display the event history in reverse chronological order. Audit details intentionally exclude password hashes, session tokens, and license secrets.
