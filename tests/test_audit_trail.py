@@ -4,7 +4,7 @@ import sqlite3
 import pytest
 
 from app import get_db
-from tests.test_app import add_asset, post_form
+from test_app import add_asset, post_form
 
 
 def audit_rows(app):
