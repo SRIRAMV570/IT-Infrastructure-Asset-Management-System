@@ -33,8 +33,8 @@
 - [x] Regression tests added for category totals, empty category summaries, field-level errors, duplicate identifiers, and keyboard focus styling.
 - [x] GitHub Actions workflow exists and is configured to run `python -m pytest -q` on branch pushes and pull requests.
 - [ ] Local `python -m pytest -q` execution: **not run in this session**. An attempt to clone the public repository failed because this environment could not resolve `github.com`. Run the command locally before merge.
-- [ ] PR GitHub Actions check: pending PR creation and workflow execution.
-- [ ] Teammate approval: pending review.
+- [x] PR GitHub Actions check: **passed** on October 30, 2026. The latest PR run executed `python -m pytest -q` and reported **32 passed in 6.78s**.
+- [ ] Teammate approval: requested from @SharveshK1228; review is pending.
 - [ ] One-minute demo video: not recorded or uploaded in this session.
 
 ### One-minute demo run sheet
@@ -52,5 +52,6 @@ Use synthetic records and a local development instance. Do not show real credent
 ### Deviations and limitations
 
 - The one-minute video still needs to be recorded by a team member using the running application and uploaded to the repository.
-- Local pytest execution and manual browser verification remain outstanding; do not treat this handoff note as evidence that those checks passed.
+- Local pytest execution and manual browser verification remain outstanding; do not treat the passing CI run as a substitute for the required local/manual checks.
+- The first CI run exposed an outdated duplicate-error assertion; the assertion was updated to verify the field-specific messages, and the subsequent PR run passed.
 - This change is limited to Sprint 1 S1-04 and the S1-05 validation/demo handoff. Sprint 2 maintenance scheduling (S2-02) remains a separate planned item.
