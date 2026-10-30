@@ -4,11 +4,6 @@
   <p class="eyebrow"><a class="text-link" href="{{ url_for('asset_list') }}">Assets</a> / {{ "Edit" if is_edit|default(false) else "New" }}</p>
   <h1>{{ "Edit asset" if is_edit|default(false) else "Register an asset" }}</h1>
   <p class="muted">Asset tag, name, and category are required. Tags and serial numbers must be unique.</p>
-  {% set errors = {
-    "asset_tag": "Enter an asset tag.",
-    "name": "Enter an asset name.",
-    "category": "Enter an asset category."
-  } %}
   <form class="panel form-grid" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <label for="asset-tag">Asset tag <span class="required">*</span>
