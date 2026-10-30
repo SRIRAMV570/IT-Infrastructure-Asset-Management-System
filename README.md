@@ -167,9 +167,7 @@ python -m pytest -q
 
 ## Current Implementation
 
-The initial application source supports asset registration and validation, inventory search and status filtering, an inventory dashboard, allocation and return history, and retirement of available assets. Automated tests cover these behaviors.
-
-Authentication and role-based permissions, asset editing, license and warranty management, maintenance scheduling, alerts, reporting, and audit history remain to be implemented. This prototype is for local development and evaluation only; do not expose it to an untrusted network or use it for real organizational data until authentication, authorization, and deployment security are added.
+The current application supports authenticated asset registration, editing, inventory search and status filtering, allocation, transfer, return, retirement, allocation history, and an append-only audit trail for asset lifecycle changes. Role-based authorization and CSRF protection are enforced on mutating routes. License and warranty management, maintenance scheduling, alerts, and reporting are not part of the current implementation. This prototype remains intended for local development and evaluation; configure production-grade deployment security before exposing it to an untrusted network.
 7. Verify login, asset creation, allocation, expiry alerts, and reporting.
 
 Do not commit passwords, API keys, database credentials, or other secrets to version control.
