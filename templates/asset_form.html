@@ -12,14 +12,17 @@
   <form class="panel form-grid" method="post" novalidate>
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <label for="asset-tag">Asset tag <span class="required">*</span>
-      <input id="asset-tag" name="asset_tag" value="{{ asset.get('asset_tag', '') }}" required maxlength="80" autocomplete="off" aria-describedby="asset-tag-help">
+      <input id="asset-tag" name="asset_tag" value="{{ asset.get('asset_tag', '') }}" required maxlength="80" autocomplete="off" aria-invalid="{{ 'true' if field_errors|default({}).get('asset_tag') else 'false' }}" aria-describedby="asset-tag-help{% if field_errors|default({}).get('asset_tag') %} asset-tag-error{% endif %}">
       <span class="field-help" id="asset-tag-help">A unique identifier used to find this asset.</span>
+      {% if field_errors|default({}).get('asset_tag') %}<span class="field-error" id="asset-tag-error" role="alert">{{ field_errors.asset_tag }}</span>{% endif %}
     </label>
     <label for="asset-name">Asset name <span class="required">*</span>
-      <input id="asset-name" name="name" value="{{ asset.get('name', '') }}" required maxlength="120" autocomplete="off">
+      <input id="asset-name" name="name" value="{{ asset.get('name', '') }}" required maxlength="120" autocomplete="off" aria-invalid="{{ 'true' if field_errors|default({}).get('name') else 'false' }}" aria-describedby="{% if field_errors|default({}).get('name') %}asset-name-error{% endif %}">
+    {% if field_errors|default({}).get('name') %}<span class="field-error" id="asset-name-error" role="alert">{{ field_errors.name }}</span>{% endif %}
     </label>
     <label for="asset-category">Category <span class="required">*</span>
-      <input id="asset-category" name="category" value="{{ asset.get('category', '') }}" required maxlength="80" placeholder="Laptop, monitor, software">
+      <input id="asset-category" name="category" value="{{ asset.get('category', '') }}" required maxlength="80" placeholder="Laptop, monitor, software" aria-invalid="{{ 'true' if field_errors|default({}).get('category') else 'false' }}" aria-describedby="{% if field_errors|default({}).get('category') %}asset-category-error{% endif %}">
+    {% if field_errors|default({}).get('category') %}<span class="field-error" id="asset-category-error" role="alert">{{ field_errors.category }}</span>{% endif %}
     </label>
     <label for="manufacturer">Manufacturer
       <input id="manufacturer" name="manufacturer" value="{{ asset.get('manufacturer', '') }}" maxlength="100">
@@ -28,14 +31,16 @@
       <input id="model" name="model" value="{{ asset.get('model', '') }}" maxlength="100">
     </label>
     <label for="serial-number">Serial number
-      <input id="serial-number" name="serial_number" value="{{ asset.get('serial_number', '') }}" maxlength="120" aria-describedby="serial-help">
+      <input id="serial-number" name="serial_number" value="{{ asset.get('serial_number', '') }}" maxlength="120" aria-invalid="{{ 'true' if field_errors|default({}).get('serial_number') else 'false' }}" aria-describedby="serial-help{% if field_errors|default({}).get('serial_number') %} serial-number-error{% endif %}">
       <span class="field-help" id="serial-help">Optional. Must be unique when provided.</span>
+      {% if field_errors|default({}).get('serial_number') %}<span class="field-error" id="serial-number-error" role="alert">{{ field_errors.serial_number }}</span>{% endif %}
     </label>
     <label for="location">Location
       <input id="location" name="location" value="{{ asset.get('location', '') }}" maxlength="120">
     </label>
     <label for="purchase-date">Purchase date
-      <input id="purchase-date" type="date" name="purchase_date" value="{{ asset.get('purchase_date', '') }}">
+      <input id="purchase-date" type="date" name="purchase_date" value="{{ asset.get('purchase_date', '') }}" aria-invalid="{{ 'true' if field_errors|default({}).get('purchase_date') else 'false' }}" aria-describedby="{% if field_errors|default({}).get('purchase_date') %}purchase-date-error{% endif %}">
+      {% if field_errors|default({}).get('purchase_date') %}<span class="field-error" id="purchase-date-error" role="alert">{{ field_errors.purchase_date }}</span>{% endif %}
     </label>
     <div class="form-actions">
       <a class="button button-secondary" href="{{ url_for('asset_list') }}">Cancel</a>
