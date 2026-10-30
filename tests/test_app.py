@@ -108,8 +108,8 @@ def test_asset_creation_rejects_duplicate_tag_and_serial(client):
     duplicate_tag = add_asset(client, serial_number="SER-002")
     duplicate_serial = add_asset(client, asset_tag="LAP-002")
 
-    assert b"Asset tag and serial number must be unique." in duplicate_tag.data
-    assert b"Asset tag and serial number must be unique." in duplicate_serial.data
+    assert b"This asset tag is already in use." in duplicate_tag.data
+    assert b"This serial number is already in use." in duplicate_serial.data
 
 
 def test_invalid_purchase_date_is_rejected(client):
@@ -389,16 +389,6 @@ def test_asset_form_associates_errors_with_the_relevant_fields(client):
     assert 'aria-invalid="true"' in page
     assert 'id="asset-tag-error" role="alert"' in page
     assert 'id="asset-category-error" role="alert"' in page
-
-
-def test_duplicate_asset_tag_and_serial_errors_are_field_specific(client):
-    add_asset(client)
-
-    duplicate_tag = add_asset(client, serial_number="SER-NEW")
-    duplicate_serial = add_asset(client, asset_tag="LAP-NEW")
-
-    assert b"This asset tag is already in use." in duplicate_tag.data
-    assert b"This serial number is already in use." in duplicate_serial.data
 
 
 def test_keyboard_focus_indicators_are_available_on_forms_and_links(client):
