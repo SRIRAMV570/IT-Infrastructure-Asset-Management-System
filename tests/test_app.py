@@ -108,8 +108,8 @@ def test_asset_creation_rejects_duplicate_tag_and_serial(client):
     duplicate_tag = add_asset(client, serial_number="SER-002")
     duplicate_serial = add_asset(client, asset_tag="LAP-002")
 
-    assert b"Asset tag and serial number must be unique." in duplicate_tag.data
-    assert b"Asset tag and serial number must be unique." in duplicate_serial.data
+    assert b"This asset tag is already in use." in duplicate_tag.data
+    assert b"This serial number is already in use." in duplicate_serial.data
 
 
 def test_invalid_purchase_date_is_rejected(client):
@@ -127,6 +127,7 @@ def test_invalid_purchase_date_is_rejected(client):
 
     assert response.status_code == 400
     assert b"Purchase date must be a valid date." in response.data
+    assert b'id="purchase-date-error" role="alert"' in response.data
 
 
 def test_asset_search_and_status_filter(client):
@@ -340,3 +341,60 @@ def test_asset_manager_can_manage_assets(app):
 
     assert response.status_code == 200
     assert b"Developer laptop" in response.data
+
+
+def test_dashboard_summarizes_asset_categories(client):
+    add_asset(client)
+    add_asset(client, asset_tag="LAP-002", serial_number="SER-002")
+    add_asset(
+        client,
+        asset_tag="MON-001",
+        name="Office monitor",
+        category="Monitor",
+        serial_number="SER-003",
+    )
+
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert b"Asset categories" in response.data
+    assert re.search(
+        rb'<span>Laptop</span>\s*<strong>2</strong>',
+        response.data,
+    )
+    assert re.search(
+        rb'<span>Monitor</span>\s*<strong>1</strong>',
+        response.data,
+    )
+    assert b'href="/assets?q=Laptop"' in response.data
+
+
+def test_dashboard_category_summary_is_empty_without_assets(client):
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert b"Category totals will appear" in response.data
+
+
+def test_asset_form_associates_errors_with_the_relevant_fields(client):
+    response = post_form(
+        client,
+        "/assets/new",
+        {"name": "Laptop"},
+        follow_redirects=False,
+    )
+
+    page = response.get_data(as_text=True)
+    assert response.status_code == 400
+    assert 'aria-invalid="true"' in page
+    assert 'id="asset-tag-error" role="alert"' in page
+    assert 'id="asset-category-error" role="alert"' in page
+
+
+def test_keyboard_focus_indicators_are_available_on_forms_and_links(client):
+    response = client.get("/static/style.css")
+
+    assert response.status_code == 200
+    assert b"input:focus" in response.data
+    assert b"button:focus-visible" in response.data
+    assert b"a:focus-visible" in response.data
