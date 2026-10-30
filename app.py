@@ -253,9 +253,18 @@ def create_app(test_config=None):
                 "SELECT status, COUNT(*) AS count FROM assets GROUP BY status"
             )
         }
+        category_counts = db.execute(
+            """
+            SELECT category, COUNT(*) AS count
+            FROM assets
+            GROUP BY category COLLATE NOCASE
+            ORDER BY category COLLATE NOCASE
+            """
+        ).fetchall()
         return render_template(
             "index.html",
             counts={status: counts.get(status, 0) for status in ASSET_STATUSES},
+            category_counts=category_counts,
             total=sum(counts.values()),
         )
 
