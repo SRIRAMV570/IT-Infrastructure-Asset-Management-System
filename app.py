@@ -5,8 +5,9 @@ import sqlite3
 from functools import wraps
 from pathlib import Path
 
-import click
 import json
+
+import click
 from flask import (
     Flask,
     abort,
