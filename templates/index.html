@@ -11,19 +11,66 @@
       <a class="button" href="{{ url_for('asset_create') }}">Register an asset</a>
     {% endif %}
   </div>
+
   <section class="stat-grid" aria-label="Asset totals">
     <a class="stat-card" href="{{ url_for('asset_list') }}">
       <span class="muted">All assets</span><strong>{{ total }}</strong>
     </a>
     {% for status, count in counts.items() %}
       <a class="stat-card" href="{{ url_for('asset_list', status=status) }}">
-        <span class="muted">{{ status|title }}</span><strong>{{ count }}</strong>
+        <span class="muted">{{ status|replace("_", " ")|title }}</span><strong>{{ count }}</strong>
       </a>
     {% endfor %}
   </section>
-  <section class="panel">
-    <h2>Manage inventory</h2>
-    <p>Register devices, find records, and keep allocation and return history in one place.</p>
-    <a class="text-link" href="{{ url_for('asset_list') }}">Browse asset inventory &rarr;</a>
+
+  <section class="dashboard-grid" aria-label="Inventory summaries">
+    <article class="panel summary-panel">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">By category</p>
+          <h2>Asset categories</h2>
+        </div>
+        <span class="summary-total">{{ category_counts|length }} categories</span>
+      </div>
+      {% if category_counts %}
+        <div class="summary-list">
+          {% for item in category_counts %}
+            <a class="summary-row" href="{{ url_for('asset_list', q=item.category) }}">
+              <span>{{ item.category }}</span>
+              <strong>{{ item.count }}</strong>
+            </a>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="muted empty-copy">Category totals will appear when assets are registered.</p>
+      {% endif %}
+    </article>
+
+    <article class="panel summary-panel">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">By status</p>
+          <h2>Lifecycle overview</h2>
+        </div>
+        <span class="summary-total">{{ total }} tracked</span>
+      </div>
+      <div class="summary-list">
+        {% for status, count in counts.items() %}
+          <a class="summary-row" href="{{ url_for('asset_list', status=status) }}">
+            <span><span class="status-dot status-dot-{{ status }}"></span>{{ status|replace("_", " ")|title }}</span>
+            <strong>{{ count }}</strong>
+          </a>
+        {% endfor %}
+      </div>
+    </article>
+  </section>
+
+  <section class="panel dashboard-actions">
+    <div>
+      <p class="eyebrow">Quick access</p>
+      <h2>Manage inventory</h2>
+      <p class="muted">Find asset records, review ownership, and keep lifecycle information up to date.</p>
+    </div>
+    <a class="button button-secondary" href="{{ url_for('asset_list') }}">Browse asset inventory</a>
   </section>
 {% endblock %}
