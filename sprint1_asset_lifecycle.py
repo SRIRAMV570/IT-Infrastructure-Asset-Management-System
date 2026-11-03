@@ -1,6 +1,7 @@
 """S1-02 asset lifecycle extension. S1-01 authorization and CSRF are enforced; S1-03 owns auditing."""
 import sqlite3
-from flask import abort, flash, redirect, render_template, request, url_for
+from flask import abort, flash, g, redirect, render_template, request, url_for
+import json
 
 
 def register_asset_lifecycle(
@@ -24,6 +25,7 @@ def register_asset_lifecycle(
 
         db = get_db()
         try:
+            before = dict(asset)
             changed = db.execute(
                 """UPDATE assets SET asset_tag=?, name=?, category=?,
                    manufacturer=?, model=?, serial_number=?, location=?, purchase_date=?
@@ -35,6 +37,19 @@ def register_asset_lifecycle(
             if changed.rowcount != 1:
                 db.rollback()
                 abort(409, description="Asset state changed; retry the edit.")
+            after = db.execute("SELECT * FROM assets WHERE id=?", (asset_id,)).fetchone()
+            db.execute(
+                """INSERT INTO audit_events
+                   (actor_id, actor_username, action, target_type, target_id, details)
+                   VALUES (?, ?, ?, 'asset', ?, ?)""",
+                (g.user["id"], g.user["username"], "asset.updated", asset_id,
+                 json.dumps({
+                     key: {"from": before[key], "to": after[key]}
+                     for key in ("asset_tag", "name", "category", "manufacturer",
+                                 "model", "serial_number", "location", "purchase_date")
+                     if before[key] != after[key]
+                 }, sort_keys=True, separators=(",", ":"))),
+            )
             db.commit()
         except sqlite3.IntegrityError as exc:
             db.rollback()
@@ -94,6 +109,15 @@ def register_asset_lifecycle(
             db.execute(
                 "INSERT INTO allocations (asset_id, assignee) VALUES (?, ?)",
                 (asset_id, assignee),
+            )
+            db.execute(
+                """INSERT INTO audit_events
+                   (actor_id, actor_username, action, target_type, target_id, details)
+                   VALUES (?, ?, 'asset.transferred', 'asset', ?, ?)""",
+                (g.user["id"], g.user["username"], asset_id,
+                 json.dumps({"from_assignee": current["assignee"],
+                             "to_assignee": assignee},
+                            sort_keys=True, separators=(",", ":"))),
             )
             db.commit()
         except sqlite3.IntegrityError:
