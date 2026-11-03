@@ -118,7 +118,7 @@ Expiry thresholds and notification channels should be configured according to pr
 - Store passwords using an appropriate salted password-hashing algorithm.
 - Validate inputs and use parameterized database operations.
 - Do not log passwords, session tokens, or full license secrets.
-- Record important changes in an audit trail.
+- Record asset creation, edits, allocation, transfer, return, and retirement in an append-only audit trail. Audit records include the actor, timestamp, action, affected asset, and safe change details; passwords and secrets are excluded.
 - Use synthetic data for development and testing; avoid real credentials or confidential organizational information.
 
 ## Documentation
@@ -167,9 +167,7 @@ python -m pytest -q
 
 ## Current Implementation
 
-The initial application source supports asset registration and validation, inventory search and status filtering, an inventory dashboard, allocation and return history, and retirement of available assets. Automated tests cover these behaviors.
-
-Authentication and role-based permissions, asset editing, license and warranty management, maintenance scheduling, alerts, reporting, and audit history remain to be implemented. This prototype is for local development and evaluation only; do not expose it to an untrusted network or use it for real organizational data until authentication, authorization, and deployment security are added.
+The current application supports authenticated asset registration, editing, inventory search and status filtering, allocation, transfer, return, retirement, allocation history, and an append-only audit trail for asset lifecycle changes. Role-based authorization and CSRF protection are enforced on mutating routes. License and warranty management, maintenance scheduling, alerts, and reporting are not part of the current implementation. This prototype remains intended for local development and evaluation; configure production-grade deployment security before exposing it to an untrusted network.
 7. Verify login, asset creation, allocation, expiry alerts, and reporting.
 
 Do not commit passwords, API keys, database credentials, or other secrets to version control.
@@ -188,3 +186,8 @@ The SRS, SAD, and test plan describe the broader target system. Keep implementat
 ## License
 
 No open-source license has been specified for this project. Add a license only after the project team decides how the code may be used and redistributed.
+
+
+## Asset audit trail (S1-03)
+
+Every successful asset lifecycle mutation appends an audit event in the same SQLite transaction as the underlying change. Events retain the actor ID and username, UTC/database timestamp, action, target type and ID, and JSON change details. Invalid requests and failed state transitions do not create events. SQLite triggers reject ordinary UPDATE and DELETE statements against audit records. Asset detail pages display the event history in reverse chronological order. Audit details intentionally exclude password hashes, session tokens, and license secrets.
