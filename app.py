@@ -253,9 +253,18 @@ def create_app(test_config=None):
                 "SELECT status, COUNT(*) AS count FROM assets GROUP BY status"
             )
         }
+        category_counts = db.execute(
+            """
+            SELECT category, COUNT(*) AS count
+            FROM assets
+            GROUP BY category COLLATE NOCASE
+            ORDER BY category COLLATE NOCASE
+            """
+        ).fetchall()
         return render_template(
             "index.html",
             counts={status: counts.get(status, 0) for status in ASSET_STATUSES},
+            category_counts=category_counts,
             total=sum(counts.values()),
         )
 
@@ -292,8 +301,17 @@ def create_app(test_config=None):
             values = asset_form_values()
             error = validate_asset(values)
             if error:
+                field_errors = {
+                    field: "This field is required."
+                    for field in ("asset_tag", "name", "category")
+                    if not values[field]
+                }
+                if error == "Purchase date must be a valid date.":
+                    field_errors["purchase_date"] = error
                 flash(error, "error")
-                return render_template("asset_form.html", asset=values), 400
+                return render_template(
+                    "asset_form.html", asset=values, field_errors=field_errors
+                ), 400
 
             try:
                 cursor = get_db().execute(
@@ -330,8 +348,15 @@ def create_app(test_config=None):
                     )
                 ):
                     raise
-                flash("Asset tag and serial number must be unique.", "error")
-                return render_template("asset_form.html", asset=values), 400
+                field_errors = {}
+                if "UNIQUE constraint failed: assets.asset_tag" in str(error):
+                    field_errors["asset_tag"] = "This asset tag is already in use."
+                if "UNIQUE constraint failed: assets.serial_number" in str(error):
+                    field_errors["serial_number"] = "This serial number is already in use."
+                flash("Correct the highlighted duplicate value and try again.", "error")
+                return render_template(
+                    "asset_form.html", asset=values, field_errors=field_errors
+                ), 400
 
             flash("Asset created.", "success")
             return redirect(url_for("asset_detail", asset_id=cursor.lastrowid))
