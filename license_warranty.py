@@ -177,7 +177,7 @@ def register_license_warranty(app, get_db, get_asset_or_404, roles_required, rec
             """SELECT w.*, a.asset_tag, a.name AS asset_name FROM warranties w
                JOIN assets a ON a.id=w.asset_id ORDER BY w.end_date, w.id"""
         ).fetchall()
-        return render_template("warranties.html", warranties=rows)
+        return render_template("warranties.html", warranties=rows, today=date.today().isoformat())
 
     @app.route("/warranties/new", methods=("GET", "POST"))
     @roles_required(*MANAGER_ROLES)
