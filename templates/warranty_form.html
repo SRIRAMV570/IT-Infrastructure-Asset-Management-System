@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ "Edit" if warranty.get("id") else "Add" }} warranty{% endblock %}
+{% block content %}<p class="eyebrow"><a class="text-link" href="{{ url_for('warranty_list') }}">Warranties</a></p><h1>{{ "Edit" if warranty.get("id") else "Add" }} warranty</h1>
+<section class="panel"><form method="post" class="form-grid"><input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+<label>Asset <span class="required">*</span><select name="asset_id" required><option value="">Choose asset</option>{% for asset in assets %}<option value="{{ asset.id }}" {% if warranty.get('asset_id')|string == asset.id|string %}selected{% endif %}>{{ asset.asset_tag }} — {{ asset.name }}</option>{% endfor %}</select></label>
+<label>Warranty provider <span class="required">*</span><input name="provider" maxlength="120" required value="{{ warranty.get('provider','') }}"></label>
+<label>Warranty reference<input name="warranty_reference" maxlength="100" value="{{ warranty.get('warranty_reference','') }}"></label>
+<label>Coverage start <span class="required">*</span><input type="date" name="start_date" required value="{{ warranty.get('start_date','') }}"></label>
+<label>Coverage end <span class="required">*</span><input type="date" name="end_date" required value="{{ warranty.get('end_date','') }}"></label>
+<label class="grow">Notes<textarea name="notes" maxlength="1000" rows="3">{{ warranty.get('notes','') }}</textarea></label>
+<div class="form-actions"><a class="button button-secondary" href="{{ url_for('warranty_list') }}">Cancel</a><button class="button" type="submit">Save warranty</button></div></form></section>{% endblock %}
