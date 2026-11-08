@@ -518,6 +518,9 @@ def create_app(test_config=None):
         validate_asset, roles_required,
     )
 
+    from license_warranty import register_license_warranty
+    register_license_warranty(app, get_db, get_asset_or_404, roles_required, record_audit_event)
+
     return app
 
 
