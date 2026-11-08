@@ -413,9 +413,13 @@ def create_app(test_config=None):
                ORDER BY id DESC""",
             (asset_id,),
         ).fetchall()
+        warranties = get_db().execute(
+            "SELECT * FROM warranties WHERE asset_id=? ORDER BY end_date, id",
+            (asset_id,),
+        ).fetchall()
         return render_template(
             "asset_detail.html", asset=asset, allocations=allocations,
-            audit_events=audit_events,
+            audit_events=audit_events, warranties=warranties,
         )
 
     @app.post("/assets/<int:asset_id>/allocate")
