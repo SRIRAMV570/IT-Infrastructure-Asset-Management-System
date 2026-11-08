@@ -167,7 +167,7 @@ python -m pytest -q
 
 ## Current Implementation
 
-The current application supports authenticated asset registration, editing, inventory search and status filtering, allocation, transfer, return, retirement, allocation history, and an append-only audit trail for asset lifecycle changes. Role-based authorization and CSRF protection are enforced on mutating routes. License and warranty management, maintenance scheduling, alerts, and reporting are not part of the current implementation. This prototype remains intended for local development and evaluation; configure production-grade deployment security before exposing it to an untrusted network.
+The current application supports authenticated asset registration, editing, inventory search and status filtering, allocation, transfer, return, retirement, allocation history, and an append-only audit trail for asset lifecycle changes. It also includes software license records with entitlement/usage and renewal state, asset-linked warranty coverage, over-entitlement flags, and audit events for license/warranty changes. License activation keys and credentials are not stored. Maintenance scheduling, automated expiry/maintenance alerts, and reporting/import-export remain separate planned work. Role-based authorization and CSRF protection are enforced on mutating routes. This prototype remains intended for local development and evaluation; configure production-grade deployment security before exposing it to an untrusted network.
 7. Verify login, asset creation, allocation, expiry alerts, and reporting.
 
 Do not commit passwords, API keys, database credentials, or other secrets to version control.
