@@ -28,12 +28,12 @@
 ### Automated results — GitHub Actions
 **Run:** https://github.com/SRIRAMV570/IT-Infrastructure-Asset-Management-System/actions/runs/42501436781  
 **Commit:** 4345a1a46a48bdbd7670a6525725a15e3a2ce7be  
-**Result:** PASS — 51 tests passed in 14.37 seconds.
+**Result:** PASS — latest run on 6ad861670b084a614c81a2db4d36dfdac2b59049: 51 tests passed in 11.71 seconds.
 
 ### Performance smoke measurement
 - Synthetic rows: 5,000.
 - Matching rows: 1,667.
-- Indexed category/status query: 0.115 ms in the recorded GitHub-hosted runner.
+- Indexed category/status query: 0.153 ms in the recorded GitHub-hosted runner.
 - Query plan: SEARCH assets USING INDEX idx_assets_category_status (category=? AND status=?).
 
 This is a small synthetic SQLite smoke measurement, not a formal performance acceptance result. It must not be compared to an SRS latency requirement until the required dataset size, workload and threshold are confirmed from the submitted SRS and reproduced in the agreed environment.
