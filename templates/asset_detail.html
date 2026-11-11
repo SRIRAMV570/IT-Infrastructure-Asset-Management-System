@@ -56,12 +56,6 @@
     </form>
   {% endif %}
   <section class="panel">
-    <div class="section-heading"><h2>Warranty coverage</h2>{% if current_user.role in ("admin", "asset_manager") %}<a class="text-link" href="{{ url_for('warranty_create') }}">Add warranty</a>{% endif %}</div>
-    {% if warranties %}<div class="table-wrap"><table><thead><tr><th>Provider</th><th>Reference</th><th>Start</th><th>End</th><th></th></tr></thead><tbody>
-    {% for warranty in warranties %}<tr><td>{{ warranty.provider }}</td><td>{{ warranty.warranty_reference or "—" }}</td><td>{{ warranty.start_date }}</td><td>{{ warranty.end_date }}</td><td>{% if current_user.role in ("admin", "asset_manager") %}<a class="text-link" href="{{ url_for('warranty_edit', warranty_id=warranty.id) }}">Edit</a>{% endif %}</td></tr>{% endfor %}
-    </tbody></table></div>{% else %}<p class="muted">No warranty coverage recorded for this asset.</p>{% endif %}
-  </section>
-  <section class="panel">
     <h2>Audit history</h2>
     {% if audit_events %}
       <div class="table-wrap">
