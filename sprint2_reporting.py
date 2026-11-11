@@ -7,7 +7,7 @@ from flask import abort, flash, make_response, redirect, render_template, reques
 
 CSV_COLUMNS = (
     "asset_tag", "name", "category", "manufacturer", "model",
-    "serial_number", "status", "location", "purchase_date",
+    "serial_number", "status", "location", "purchase_date", "assignee",
 )
 ASSET_STATUSES = {"available", "allocated", "maintenance", "retired"}
 MAX_IMPORT_BYTES = 1_048_576
@@ -40,7 +40,7 @@ def register_reports(app, get_db, roles_required, record_audit_event):
 
         query = """SELECT a.asset_tag, a.name, a.category, a.manufacturer,
                           a.model, a.serial_number, a.status, a.location,
-                          a.purchase_date, COALESCE(al.assignee, '') AS current_assignee,
+                          a.purchase_date, COALESCE(al.assignee, '') AS assignee,
                           a.created_at
                    FROM assets AS a
                    LEFT JOIN allocations AS al
@@ -54,7 +54,7 @@ def register_reports(app, get_db, roles_required, record_audit_event):
 
         output = io.StringIO(newline="")
         writer = csv.writer(output)
-        writer.writerow((*CSV_COLUMNS, "current_assignee", "created_at"))
+        writer.writerow((*CSV_COLUMNS, "created_at"))
         for row in rows:
             writer.writerow([row[column] or "" for column in
                 (*CSV_COLUMNS, "current_assignee", "created_at")])
@@ -99,6 +99,10 @@ def register_reports(app, get_db, roles_required, record_audit_event):
                     raise ValueError(f"Row {line_number}: asset_tag, name and category are required.")
                 if row["status"] not in ASSET_STATUSES:
                     raise ValueError(f"Row {line_number}: invalid status.")
+                if row["status"] == "allocated" and not row["assignee"]:
+                    raise ValueError(f"Row {line_number}: allocated assets require an assignee.")
+                if row["status"] != "allocated" and row["assignee"]:
+                    raise ValueError(f"Row {line_number}: assignee is only valid for allocated assets.")
                 if row["purchase_date"]:
                     try:
                         date.fromisoformat(row["purchase_date"])
@@ -137,9 +141,15 @@ def register_reports(app, get_db, roles_required, record_audit_event):
                         tuple(row[column] or None if column == "serial_number" else row[column]
                               for column in CSV_COLUMNS),
                     )
+                    if row["status"] == "allocated":
+                        db.execute(
+                            "INSERT INTO allocations (asset_id, assignee) VALUES (?, ?)",
+                            (cursor.lastrowid, row["assignee"]),
+                        )
                     record_audit_event(
                         db, "asset.imported", "asset", cursor.lastrowid,
-                        {"asset_tag": row["asset_tag"], "source": "csv"},
+                        {"asset_tag": row["asset_tag"], "source": "csv",
+                         "status": row["status"]},
                     )
                 db.commit()
             except Exception:
