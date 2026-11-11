@@ -302,7 +302,7 @@ def test_alert_acknowledge_assign_resolve_history_and_audit(client, app):
     assert all(row["actor_username"] == "admin" for row in history)
     assert all(row["created_at"] for row in history)
     assert [row["action"] for row in actions] == [
-        "alert.acknowledged", "alert.assigned", "alert.resolved"
+        "alert.generated", "alert.acknowledged", "alert.assigned", "alert.resolved"
     ]
 
     duplicate_resolve = post_form(
