@@ -75,7 +75,7 @@ def test_export_csv_has_expected_headers_and_download_headers(client):
     response = client.get("/reports/assets.csv")
     assert response.status_code == 200
     assert response.mimetype == "text/csv"
-    assert "attachment; filename=itams-assets.csv" in response.headers["Content-Disposition"]
+    assert 'attachment; filename="itams-assets.csv"' == response.headers["Content-Disposition"]
     rows = list(csv.reader(io.StringIO(response.get_data(as_text=True).lstrip("\ufeff"))))
     assert rows[0] == [
         "asset_tag", "name", "category", "manufacturer", "model",
