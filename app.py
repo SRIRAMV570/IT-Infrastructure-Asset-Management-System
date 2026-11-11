@@ -123,6 +123,14 @@ def create_app(test_config=None):
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
         SESSION_COOKIE_SECURE=os.environ.get("SESSION_COOKIE_SECURE") == "1",
+        ALERT_LICENSE_EXPIRY_DAYS=30,
+        ALERT_WARRANTY_EXPIRY_DAYS=30,
+        ALERT_MAINTENANCE_OVERDUE_DAYS=1,
+        ALERT_MAINTENANCE_HIGH_DAYS=7,
+        ALERT_MAINTENANCE_CRITICAL_DAYS=30,
+        ALERT_INCOMPLETE_ASSET_FIELDS=(
+            "manufacturer", "model", "serial_number", "location", "purchase_date"
+        ),
     )
     if test_config:
         app.config.update(test_config)
@@ -520,6 +528,10 @@ def create_app(test_config=None):
         app, get_db, get_asset_or_404, asset_form_values,
         validate_asset, roles_required,
     )
+
+    # S2-03: install alert generation, assignment and resolution workflows.
+    from alerts import register_alerts
+    register_alerts(app, get_db, roles_required, record_audit_event)
 
     return app
 
