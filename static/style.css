@@ -124,3 +124,5 @@ code { overflow-wrap: anywhere; }
 @media (prefers-reduced-motion: no-preference) {
   .stat-card, .summary-row, .button { transition: border-color .15s ease, background-color .15s ease, color .15s ease; }
 }
+
+.dashboard-links { display: flex; flex-wrap: wrap; gap: 10px; }

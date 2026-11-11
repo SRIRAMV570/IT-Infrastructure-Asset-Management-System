@@ -212,6 +212,8 @@ def test_repeated_generation_does_not_duplicate_active_alerts(client, app):
     seed_source_rows(app, "software_licenses", [{
         "asset_id": asset_id,
         "product_name": "Design Suite",
+        "entitlement_count": 1,
+        "used_count": 0,
         "expiry_date": (date.today() + timedelta(days=5)).isoformat(),
         "renewal_status": "renewal_pending",
     }])
