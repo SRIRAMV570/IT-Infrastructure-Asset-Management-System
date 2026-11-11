@@ -47,7 +47,7 @@
       <h2 id="import-heading">Import assets from CSV</h2>
       <p class="muted">Upload a UTF-8 CSV containing no more than {{ import_limit }} new asset rows. Imports are all-or-nothing: invalid rows reject the entire file.</p>
       <p>Required header order:</p>
-      <code>asset_tag,name,category,manufacturer,model,serial_number,status,location,purchase_date</code>
+      <code>asset_tag,name,category,manufacturer,model,serial_number,status,location,purchase_date,assignee</code>
       <form method="post" action="{{ url_for('import_assets_csv') }}" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <label for="csv-file">CSV file</label>
