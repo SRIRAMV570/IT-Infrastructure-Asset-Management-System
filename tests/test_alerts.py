@@ -286,7 +286,7 @@ def test_alert_acknowledge_assign_resolve_history_and_audit(client, app):
             (alert["id"],),
         ).fetchall()
         actions = db.execute(
-            "SELECT action FROM audit_events WHERE target_type='alert' AND target_id=?",
+            "SELECT action FROM audit_events WHERE target_type='alert' AND target_id=? ORDER BY id",
             (alert["id"],),
         ).fetchall()
 
