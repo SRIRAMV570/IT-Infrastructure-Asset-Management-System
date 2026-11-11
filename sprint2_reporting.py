@@ -57,7 +57,7 @@ def register_reports(app, get_db, roles_required, record_audit_event):
         writer.writerow((*CSV_COLUMNS, "created_at"))
         for row in rows:
             writer.writerow([row[column] or "" for column in
-                (*CSV_COLUMNS, "current_assignee", "created_at")])
+                (*CSV_COLUMNS, "created_at")])
 
         response = make_response("\ufeff" + output.getvalue())
         response.headers["Content-Type"] = "text/csv; charset=utf-8"
@@ -138,8 +138,10 @@ def register_reports(app, get_db, roles_required, record_audit_event):
                            (asset_tag, name, category, manufacturer, model,
                             serial_number, status, location, purchase_date)
                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                        tuple(row[column] or None if column == "serial_number" else row[column]
-                              for column in CSV_COLUMNS),
+                        tuple(
+                            row[column] or None if column == "serial_number" else row[column]
+                            for column in CSV_COLUMNS if column != "assignee"
+                        ),
                     )
                     if row["status"] == "allocated":
                         db.execute(
