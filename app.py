@@ -522,8 +522,13 @@ def create_app(test_config=None):
         validate_asset, roles_required,
     )
 
+    # S2-01: register license and warranty management before alert generation.
     from license_warranty import register_license_warranty
     register_license_warranty(app, get_db, get_asset_or_404, roles_required, record_audit_event)
+
+    # S2-03: retain the alert lifecycle from main; it depends on S2-01 and S2-02 tables.
+    from alerts import register_alerts
+    register_alerts(app, get_db, roles_required, record_audit_event)
 
     return app
 
