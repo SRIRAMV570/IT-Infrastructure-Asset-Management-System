@@ -361,8 +361,9 @@ def test_alerts_cli_supports_date_override_and_system_actor(app):
         asset_id = cursor.lastrowid
         get_db().execute(
             """INSERT INTO software_licenses
-               (asset_id, product_name, expiry_date, renewal_status)
-               VALUES (?, 'CLI test license', '2026-11-21', 'active')""",
+               (asset_id, product_name, vendor, license_reference, entitlement_count,
+                used_count, expiry_date, renewal_status, notes)
+               VALUES (?, 'CLI test license', '', '', 1, 0, '2026-11-21', 'active', '')""",
             (asset_id,),
         )
         get_db().commit()
