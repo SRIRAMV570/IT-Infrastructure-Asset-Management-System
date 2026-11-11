@@ -52,7 +52,7 @@ This is a small synthetic SQLite smoke measurement, not a formal performance acc
 - [ ] Confirm the SRS performance target and run its agreed workload.
 
 ## Limitations / integration boundaries
-- Expiry and renewal dates are stored and displayed. Automated expiry alert generation/acknowledgement/assignment is Shreyan's separate S2-03 task; this module does not duplicate that alert workflow.
+- Expiry and renewal dates are stored and displayed. The existing S2-03 alert module on `main` remains registered alongside this module and consumes the license and warranty tables.
 - License usage is a manually recorded count. No endpoint or telemetry integration is claimed to discover real-time usage.
 - Activation keys and other credentials are deliberately not stored.
 - Manual browser compatibility and production-scale performance sign-off remain pending.
