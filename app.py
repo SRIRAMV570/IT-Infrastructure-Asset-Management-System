@@ -133,6 +133,9 @@ def create_app(test_config=None):
     finally:
         connection.close()
 
+    from maintenance import register_maintenance
+    register_maintenance(app, get_db, get_asset_or_404, roles_required, record_audit_event)
+
     @app.teardown_appcontext
     def close_db(_error=None):
         connection = g.pop("db", None)

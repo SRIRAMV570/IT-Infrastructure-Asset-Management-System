@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Record completed service{% endblock %}
+{% block content %}
+  <p class="eyebrow"><a class="text-link" href="{{ url_for('maintenance_list', asset_id=schedule.asset_id) }}">Maintenance</a> / Complete</p>
+  <div class="page-heading">
+    <div>
+      <h1>Record completed service</h1>
+      <p class="muted">{{ schedule.asset_tag }} · {{ schedule.asset_name }} · {{ schedule.title }}</p>
+    </div>
+    <span class="status">{{ schedule.status|replace("_", " ")|title }}</span>
+  </div>
+  <form class="panel form-grid" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>Service date <span class="required">*</span>
+      <input type="date" name="service_date" required value="{{ values.service_date }}" aria-invalid="{{ 'true' if field_errors.get('service_date') else 'false' }}">
+      {% if field_errors.get("service_date") %}<span class="field-error" role="alert">{{ field_errors.service_date }}</span>{% endif %}
+    </label>
+    <label>Technician / service provider <span class="required">*</span>
+      <input name="performed_by" required maxlength="120" value="{{ values.performed_by }}" placeholder="e.g. IT Support" aria-invalid="{{ 'true' if field_errors.get('performed_by') else 'false' }}">
+      {% if field_errors.get("performed_by") %}<span class="field-error" role="alert">{{ field_errors.performed_by }}</span>{% endif %}
+    </label>
+    <label class="grow">Service notes <span class="required">*</span>
+      <textarea name="notes" rows="4" maxlength="2000" required aria-invalid="{{ 'true' if field_errors.get('notes') else 'false' }}">{{ values.notes }}</textarea>
+      {% if field_errors.get("notes") %}<span class="field-error" role="alert">{{ field_errors.notes }}</span>{% endif %}
+    </label>
+    <div class="form-actions">
+      <a class="button button-secondary" href="{{ url_for('maintenance_list', asset_id=schedule.asset_id) }}">Cancel</a>
+      <button class="button" type="submit">Save service history</button>
+    </div>
+  </form>
+{% endblock %}

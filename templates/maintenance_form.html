@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Schedule maintenance{% endblock %}
+{% block content %}
+  <p class="eyebrow"><a class="text-link" href="{{ url_for('maintenance_list') }}">Maintenance</a> / New schedule</p>
+  <div class="page-heading">
+    <div>
+      <h1>Schedule maintenance</h1>
+      <p class="muted">Choose an asset, due date, priority, and responsible team or technician.</p>
+    </div>
+  </div>
+  <form class="panel form-grid" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>Asset <span class="required">*</span>
+      <select name="asset_id" required aria-invalid="{{ 'true' if field_errors.get('asset_id') else 'false' }}">
+        <option value="">Select an asset</option>
+        {% for asset in assets %}
+          <option value="{{ asset.id }}" {% if values.asset_id == asset.id|string %}selected{% endif %}>{{ asset.asset_tag }} · {{ asset.name }}</option>
+        {% endfor %}
+      </select>
+      {% if field_errors.get("asset_id") %}<span class="field-error" role="alert">{{ field_errors.asset_id }}</span>{% endif %}
+    </label>
+    <label>Maintenance title <span class="required">*</span>
+      <input name="title" required maxlength="120" minlength="3" value="{{ values.title }}" placeholder="e.g. Quarterly laptop inspection" aria-invalid="{{ 'true' if field_errors.get('title') else 'false' }}">
+      {% if field_errors.get("title") %}<span class="field-error" role="alert">{{ field_errors.title }}</span>{% endif %}
+    </label>
+    <label>Due date <span class="required">*</span>
+      <input type="date" name="due_date" required value="{{ values.due_date }}" aria-invalid="{{ 'true' if field_errors.get('due_date') else 'false' }}">
+      {% if field_errors.get("due_date") %}<span class="field-error" role="alert">{{ field_errors.due_date }}</span>{% endif %}
+    </label>
+    <label>Priority <span class="required">*</span>
+      <select name="priority" required>
+        {% for priority in priorities %}
+          <option value="{{ priority }}" {% if values.priority == priority %}selected{% endif %}>{{ priority|title }}</option>
+        {% endfor %}
+      </select>
+      {% if field_errors.get("priority") %}<span class="field-error" role="alert">{{ field_errors.priority }}</span>{% endif %}
+    </label>
+    <label>Responsible team / technician <span class="required">*</span>
+      <input name="assigned_to" required maxlength="120" value="{{ values.assigned_to }}" placeholder="e.g. IT Support" aria-invalid="{{ 'true' if field_errors.get('assigned_to') else 'false' }}">
+      {% if field_errors.get("assigned_to") %}<span class="field-error" role="alert">{{ field_errors.assigned_to }}</span>{% endif %}
+    </label>
+    <label>Notes
+      <input name="notes" maxlength="1000" value="{{ values.notes }}" placeholder="Optional preparation or fault details" aria-invalid="{{ 'true' if field_errors.get('notes') else 'false' }}">
+      {% if field_errors.get("notes") %}<span class="field-error" role="alert">{{ field_errors.notes }}</span>{% endif %}
+    </label>
+    <div class="form-actions">
+      <a class="button button-secondary" href="{{ url_for('maintenance_list') }}">Cancel</a>
+      <button class="button" type="submit" {% if not assets %}disabled{% endif %}>Save schedule</button>
+    </div>
+    {% if not assets %}<p class="muted">Register an active asset before creating a maintenance schedule.</p>{% endif %}
+  </form>
+{% endblock %}
