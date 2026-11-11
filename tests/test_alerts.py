@@ -130,12 +130,16 @@ def test_license_and_warranty_threshold_boundaries(client, app):
         {
             "asset_id": asset_id,
             "product_name": "Expiring Suite",
+            "entitlement_count": 1,
+            "used_count": 0,
             "expiry_date": (today + timedelta(days=30)).isoformat(),
             "renewal_status": "active",
         },
         {
             "asset_id": asset_id,
             "product_name": "Not Yet Due Suite",
+            "entitlement_count": 1,
+            "used_count": 0,
             "expiry_date": (today + timedelta(days=31)).isoformat(),
             "renewal_status": "active",
         },
