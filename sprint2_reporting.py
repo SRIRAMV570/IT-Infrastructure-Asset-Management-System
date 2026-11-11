@@ -1,6 +1,7 @@
 """S2-04 reporting and validated CSV import/export routes."""
 import csv
 import io
+import sqlite3
 from datetime import date
 
 from flask import abort, flash, make_response, redirect, render_template, request, url_for
@@ -157,7 +158,7 @@ def register_reports(app, get_db, roles_required, record_audit_event):
             except Exception:
                 db.rollback()
                 raise
-        except (UnicodeDecodeError, csv.Error, ValueError) as error:
+        except (UnicodeDecodeError, csv.Error, ValueError, sqlite3.IntegrityError) as error:
             get_db().rollback()
             flash(f"CSV import rejected: {error}", "error")
             return redirect(url_for("reports"))
