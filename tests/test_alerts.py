@@ -9,31 +9,6 @@ from app import create_app, get_db
 
 
 ADMIN_PASSWORD = "CorrectHorseBatteryStaple42!"
-SOURCE_SCHEMA = """
-CREATE TABLE software_licenses (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    asset_id INTEGER,
-    product_name TEXT NOT NULL,
-    expiry_date TEXT NOT NULL,
-    renewal_status TEXT NOT NULL DEFAULT 'active'
-);
-CREATE TABLE warranties (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    asset_id INTEGER NOT NULL,
-    provider TEXT NOT NULL,
-    start_date TEXT NOT NULL,
-    end_date TEXT NOT NULL
-);
-CREATE TABLE maintenance_schedules (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    asset_id INTEGER NOT NULL,
-    title TEXT NOT NULL,
-    due_date TEXT NOT NULL,
-    priority TEXT NOT NULL,
-    status TEXT NOT NULL,
-    assigned_to TEXT NOT NULL
-);
-"""
 
 
 @pytest.fixture()
@@ -48,9 +23,6 @@ def app(tmp_path):
         input=f"{ADMIN_PASSWORD}\n{ADMIN_PASSWORD}\n",
     )
     assert result.exit_code == 0, result.output
-    with application.app_context():
-        get_db().executescript(SOURCE_SCHEMA)
-        get_db().commit()
     return application
 
 
