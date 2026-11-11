@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">S2-04 · Reporting</p>
+      <h1>Asset reports</h1>
+      <p class="muted">Review inventory summaries and export or import validated asset records.</p>
+    </div>
+    <a class="button" href="{{ url_for('export_assets_csv') }}">Export assets CSV</a>
+  </div>
+
+  <section class="panel" aria-labelledby="status-heading">
+    <h2 id="status-heading">Inventory by status</h2>
+    {% if summary %}
+      <div class="stat-grid">
+        {% for item in summary %}
+          <a class="stat-card" href="{{ url_for('asset_list', status=item.status) }}">
+            <span class="muted">{{ item.status|title }}</span>
+            <strong>{{ item.count }}</strong>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="muted">No assets are available for reporting yet.</p>
+    {% endif %}
+  </section>
+
+  <section class="panel" aria-labelledby="category-heading">
+    <h2 id="category-heading">Inventory by category</h2>
+    {% if categories %}
+      <table>
+        <thead><tr><th scope="col">Category</th><th scope="col">Asset count</th></tr></thead>
+        <tbody>
+          {% for item in categories %}
+            <tr><td>{{ item.category }}</td><td>{{ item.count }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="muted">Category totals will appear when assets are registered.</p>
+    {% endif %}
+  </section>
+
+  {% if current_user.role in ("admin", "asset_manager") %}
+    <section class="panel" aria-labelledby="import-heading">
+      <h2 id="import-heading">Import assets from CSV</h2>
+      <p class="muted">Upload a UTF-8 CSV containing no more than {{ import_limit }} new asset rows. Imports are all-or-nothing: invalid rows reject the entire file.</p>
+      <p>Required header order:</p>
+      <code>asset_tag,name,category,manufacturer,model,serial_number,status,location,purchase_date</code>
+      <form method="post" action="{{ url_for('import_assets_csv') }}" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label for="csv-file">CSV file</label>
+        <input id="csv-file" name="file" type="file" accept=".csv,text/csv" required>
+        <button class="button" type="submit">Validate and import</button>
+      </form>
+    </section>
+  {% endif %}
+{% endblock %}
