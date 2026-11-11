@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Alerts{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">ITAMS / Operations</p>
+      <h1>Alerts</h1>
+      <p class="muted">Expiry, overdue maintenance and incomplete asset records.</p>
+    </div>
+    {% if current_user.role in ("admin", "asset_manager") %}
+      <form method="post" action="{{ url_for('alerts_generate') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="button" type="submit">Generate alerts</button>
+      </form>
+    {% endif %}
+  </div>
+
+  <section class="stat-grid" aria-label="Alert counts">
+    <div class="stat-card"><span class="muted">Open</span><strong>{{ counts.open }}</strong></div>
+    <div class="stat-card"><span class="muted">Acknowledged</span><strong>{{ counts.acknowledged }}</strong></div>
+    <div class="stat-card"><span class="muted">Assigned</span><strong>{{ counts.assigned }}</strong></div>
+    <div class="stat-card"><span class="muted">Resolved</span><strong>{{ counts.resolved }}</strong></div>
+  </section>
+
+  <form class="filters panel" method="get" action="{{ url_for('alerts_list') }}">
+    <label>Status
+      <select name="status">
+        <option value="">All statuses</option>
+        {% for status in ("open", "acknowledged", "assigned", "resolved") %}
+          <option value="{{ status }}" {% if status_filter == status %}selected{% endif %}>{{ status|replace("_", " ")|title }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Alert type
+      <select name="type">
+        <option value="">All types</option>
+        {% for alert_type in alert_types %}
+          <option value="{{ alert_type }}" {% if type_filter == alert_type %}selected{% endif %}>{{ alert_type|replace("_", " ")|title }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <button class="button button-secondary" type="submit">Apply filters</button>
+    <a class="text-link" href="{{ url_for('alerts_list') }}">Clear</a>
+  </form>
+
+  <section class="panel">
+    <h2>Alert register</h2>
+    {% if alerts %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Severity</th><th>Alert</th><th>Due date</th><th>Status</th><th>Assigned to</th><th></th></tr>
+          </thead>
+          <tbody>
+            {% for alert in alerts %}
+              <tr>
+                <td><strong>{{ alert.severity|title }}</strong></td>
+                <td>
+                  <strong>{{ alert.title }}</strong>
+                  <p class="muted">{{ alert.message }}</p>
+                  {% if alert.asset_id and alert.asset_tag %}
+                    <p><a class="text-link" href="{{ url_for('asset_detail', asset_id=alert.asset_id) }}">{{ alert.asset_tag }} · {{ alert.asset_name }}</a></p>
+                  {% endif %}
+                </td>
+                <td>{{ alert.due_date or "—" }}</td>
+                <td><span class="status status-{{ alert.status }}">{{ alert.status|replace("_", " ")|title }}</span></td>
+                <td>{{ alert.assigned_username or "Unassigned" }}</td>
+                <td><a class="button button-secondary button-small" href="{{ url_for('alert_detail', alert_id=alert.id) }}">View / update</a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="muted">No alerts match these filters. Managers can generate alerts from the latest source records.</p>
+    {% endif %}
+  </section>
+{% endblock %}
