@@ -28,7 +28,7 @@ def app(tmp_path):
 @pytest.fixture()
 def client(app):
     browser = app.test_client()
-    token = csrf(browser)
+    token = csrf(browser, "/login")
     browser.post("/login", data={
         "csrf_token": token, "username": "admin", "password": ADMIN_PASSWORD,
     })
