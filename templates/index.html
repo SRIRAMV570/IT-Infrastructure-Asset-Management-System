@@ -71,6 +71,9 @@
       <h2>Manage inventory</h2>
       <p class="muted">Find asset records, review ownership, and keep lifecycle information up to date.</p>
     </div>
-    <a class="button button-secondary" href="{{ url_for('asset_list') }}">Browse asset inventory</a>
+    <div class="dashboard-links">
+      <a class="button button-secondary" href="{{ url_for('asset_list') }}">Browse asset inventory</a>
+      <a class="button" href="{{ url_for('maintenance_list') }}">Maintenance and service history</a>
+    </div>
   </section>
 {% endblock %}

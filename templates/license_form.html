@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ "Edit" if license.get("id") else "Add" }} license{% endblock %}
+{% block content %}<p class="eyebrow"><a class="text-link" href="{{ url_for('license_list') }}">Software licenses</a></p><h1>{{ "Edit" if license.get("id") else "Add" }} license</h1>
+<section class="panel"><form method="post" class="form-grid"><input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+<label>Product name <span class="required">*</span><input name="product_name" maxlength="120" required value="{{ license.get('product_name','') }}"></label>
+<label>Vendor<input name="vendor" maxlength="120" value="{{ license.get('vendor','') }}"></label>
+<label>License reference <span class="field-help">Non-secret procurement/reference ID only. Do not enter activation keys or passwords.</span><input name="license_reference" maxlength="100" value="{{ license.get('license_reference','') }}"></label>
+<label>Linked asset <select name="asset_id"><option value="">Organization-wide / not linked</option>{% for asset in assets %}<option value="{{ asset.id }}" {% if license.get('asset_id')|string == asset.id|string %}selected{% endif %}>{{ asset.asset_tag }} — {{ asset.name }}</option>{% endfor %}</select></label>
+<label>Entitlement quantity <span class="required">*</span><input type="number" name="entitlement_count" min="1" required value="{{ license.get('entitlement_count','1') }}"></label>
+<label>Current usage <span class="required">*</span><input type="number" name="used_count" min="0" required value="{{ license.get('used_count','0') }}"></label>
+<label>Expiry date <span class="required">*</span><input type="date" name="expiry_date" required value="{{ license.get('expiry_date','') }}"></label>
+<label>Renewal status<select name="renewal_status">{% for state in states %}<option value="{{ state }}" {% if license.get('renewal_status','active') == state %}selected{% endif %}>{{ state|replace('_',' ')|title }}</option>{% endfor %}</select></label>
+<label class="grow">Notes<textarea name="notes" maxlength="1000" rows="3">{{ license.get('notes','') }}</textarea></label>
+<div class="form-actions"><a class="button button-secondary" href="{{ url_for('license_list') }}">Cancel</a><button class="button" type="submit">Save license</button></div></form></section>{% endblock %}

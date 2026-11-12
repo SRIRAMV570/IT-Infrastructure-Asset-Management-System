@@ -123,6 +123,14 @@ def create_app(test_config=None):
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
         SESSION_COOKIE_SECURE=os.environ.get("SESSION_COOKIE_SECURE") == "1",
+        ALERT_LICENSE_EXPIRY_DAYS=30,
+        ALERT_WARRANTY_EXPIRY_DAYS=30,
+        ALERT_MAINTENANCE_OVERDUE_DAYS=1,
+        ALERT_MAINTENANCE_HIGH_DAYS=7,
+        ALERT_MAINTENANCE_CRITICAL_DAYS=30,
+        ALERT_INCOMPLETE_ASSET_FIELDS=(
+            "manufacturer", "model", "serial_number", "location", "purchase_date"
+        ),
     )
     if test_config:
         app.config.update(test_config)
@@ -413,9 +421,13 @@ def create_app(test_config=None):
                ORDER BY id DESC""",
             (asset_id,),
         ).fetchall()
+        warranties = get_db().execute(
+            "SELECT * FROM warranties WHERE asset_id=? ORDER BY end_date, id",
+            (asset_id,),
+        ).fetchall()
         return render_template(
             "asset_detail.html", asset=asset, allocations=allocations,
-            audit_events=audit_events,
+            audit_events=audit_events, warranties=warranties,
         )
 
     @app.post("/assets/<int:asset_id>/allocate")
@@ -521,6 +533,17 @@ def create_app(test_config=None):
     # S2-04: reporting and validated CSV import/export.
     from sprint2_reporting import register_reports
     register_reports(app, get_db, roles_required, record_audit_event)
+    # S2-01: register license and warranty management before alert generation.
+    from license_warranty import register_license_warranty
+    register_license_warranty(app, get_db, get_asset_or_404, roles_required, record_audit_event)
+
+    # S2-02: maintenance scheduling and service history.
+    from maintenance import register_maintenance
+    register_maintenance(app, get_db, get_asset_or_404, roles_required, record_audit_event)
+
+    # S2-03: alert generation, assignment and resolution.
+    from alerts import register_alerts
+    register_alerts(app, get_db, roles_required, record_audit_event)
 
     return app
 
