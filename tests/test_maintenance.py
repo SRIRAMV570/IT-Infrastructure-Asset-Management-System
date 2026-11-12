@@ -288,3 +288,28 @@ def test_service_history_rows_are_immutable(client, app):
         connection.rollback()
     finally:
         connection.close()
+
+
+
+def test_maintenance_status_filter_returns_only_matching_schedules(client, app):
+    asset_id = add_asset(client)
+    create_schedule(client, asset_id, title="Scheduled inspection")
+    create_schedule(client, asset_id, title="Work to start")
+
+    connection = sqlite3.connect(app.config["DATABASE"])
+    maintenance_id = connection.execute(
+        "SELECT id FROM maintenance_schedules WHERE title=?",
+        ("Work to start",),
+    ).fetchone()[0]
+    connection.close()
+    assert post_form(client, f"/maintenance/{maintenance_id}/start").status_code == 302
+
+    scheduled = client.get("/maintenance?status=scheduled")
+    in_progress = client.get("/maintenance?status=in_progress")
+
+    assert scheduled.status_code == 200
+    assert b"Scheduled inspection" in scheduled.data
+    assert b"Work to start" not in scheduled.data
+    assert in_progress.status_code == 200
+    assert b"Work to start" in in_progress.data
+    assert b"Scheduled inspection" not in in_progress.data
