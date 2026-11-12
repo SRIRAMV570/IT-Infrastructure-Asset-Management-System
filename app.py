@@ -141,9 +141,6 @@ def create_app(test_config=None):
     finally:
         connection.close()
 
-    from maintenance import register_maintenance
-    register_maintenance(app, get_db, get_asset_or_404, roles_required, record_audit_event)
-
     @app.teardown_appcontext
     def close_db(_error=None):
         connection = g.pop("db", None)
@@ -424,9 +421,13 @@ def create_app(test_config=None):
                ORDER BY id DESC""",
             (asset_id,),
         ).fetchall()
+        warranties = get_db().execute(
+            "SELECT * FROM warranties WHERE asset_id=? ORDER BY end_date, id",
+            (asset_id,),
+        ).fetchall()
         return render_template(
             "asset_detail.html", asset=asset, allocations=allocations,
-            audit_events=audit_events,
+            audit_events=audit_events, warranties=warranties,
         )
 
     @app.post("/assets/<int:asset_id>/allocate")
@@ -529,7 +530,15 @@ def create_app(test_config=None):
         validate_asset, roles_required,
     )
 
-    # S2-03: install alert generation, assignment and resolution workflows.
+    # S2-01: register license and warranty management before alert generation.
+    from license_warranty import register_license_warranty
+    register_license_warranty(app, get_db, get_asset_or_404, roles_required, record_audit_event)
+
+    # S2-02: maintenance scheduling and service history.
+    from maintenance import register_maintenance
+    register_maintenance(app, get_db, get_asset_or_404, roles_required, record_audit_event)
+
+    # S2-03: alert generation, assignment and resolution.
     from alerts import register_alerts
     register_alerts(app, get_db, roles_required, record_audit_event)
 

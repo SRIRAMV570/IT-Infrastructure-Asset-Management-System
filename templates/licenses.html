@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Software licenses{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">Compliance</p><h1>Software licenses</h1><p class="muted">Entitlement, usage, renewal and expiry records.</p></div>
+{% if current_user.role in ("admin", "asset_manager") %}<a class="button" href="{{ url_for('license_create') }}">Add license</a>{% endif %}</div>
+<div class="table-wrap"><table><thead><tr><th>Product</th><th>Asset</th><th>Entitlement</th><th>Usage</th><th>Expiry</th><th>Renewal</th><th>Compliance</th><th></th></tr></thead><tbody>
+{% for item in licenses %}<tr><td>{{ item.product_name }}<br><span class="muted">{{ item.vendor }}</span></td><td>{{ item.asset_tag or "Organization-wide" }}</td><td>{{ item.entitlement_count }}</td><td>{{ item.used_count }}</td><td>{{ item.expiry_date }}</td><td>{{ item.renewal_status|replace("_"," ")|title }}</td><td>{% if item.over_entitled %}<span class="status status-maintenance">Over entitlement</span>{% elif item.expired %}<span class="status status-retired">Expired</span>{% else %}<span class="status status-available">Within entitlement</span>{% endif %}</td><td>{% if current_user.role in ("admin", "asset_manager") %}<a class="text-link" href="{{ url_for('license_edit', license_id=item.id) }}">Edit</a>{% endif %}</td></tr>
+{% else %}<tr><td colspan="8" class="empty-state">No license records yet.</td></tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}

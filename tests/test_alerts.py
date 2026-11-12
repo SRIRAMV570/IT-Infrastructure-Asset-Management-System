@@ -9,31 +9,6 @@ from app import create_app, get_db
 
 
 ADMIN_PASSWORD = "CorrectHorseBatteryStaple42!"
-SOURCE_SCHEMA = """
-CREATE TABLE software_licenses (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    asset_id INTEGER,
-    product_name TEXT NOT NULL,
-    expiry_date TEXT NOT NULL,
-    renewal_status TEXT NOT NULL DEFAULT 'active'
-);
-CREATE TABLE warranties (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    asset_id INTEGER NOT NULL,
-    provider TEXT NOT NULL,
-    start_date TEXT NOT NULL,
-    end_date TEXT NOT NULL
-);
-CREATE TABLE maintenance_schedules (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    asset_id INTEGER NOT NULL,
-    title TEXT NOT NULL,
-    due_date TEXT NOT NULL,
-    priority TEXT NOT NULL,
-    status TEXT NOT NULL,
-    assigned_to TEXT NOT NULL
-);
-"""
 
 
 @pytest.fixture()
@@ -48,9 +23,6 @@ def app(tmp_path):
         input=f"{ADMIN_PASSWORD}\n{ADMIN_PASSWORD}\n",
     )
     assert result.exit_code == 0, result.output
-    with application.app_context():
-        get_db().executescript(SOURCE_SCHEMA)
-        get_db().commit()
     return application
 
 
@@ -158,12 +130,16 @@ def test_license_and_warranty_threshold_boundaries(client, app):
         {
             "asset_id": asset_id,
             "product_name": "Expiring Suite",
+            "entitlement_count": 1,
+            "used_count": 0,
             "expiry_date": (today + timedelta(days=30)).isoformat(),
             "renewal_status": "active",
         },
         {
             "asset_id": asset_id,
             "product_name": "Not Yet Due Suite",
+            "entitlement_count": 1,
+            "used_count": 0,
             "expiry_date": (today + timedelta(days=31)).isoformat(),
             "renewal_status": "active",
         },
@@ -236,6 +212,8 @@ def test_repeated_generation_does_not_duplicate_active_alerts(client, app):
     seed_source_rows(app, "software_licenses", [{
         "asset_id": asset_id,
         "product_name": "Design Suite",
+        "entitlement_count": 1,
+        "used_count": 0,
         "expiry_date": (date.today() + timedelta(days=5)).isoformat(),
         "renewal_status": "renewal_pending",
     }])
@@ -389,8 +367,9 @@ def test_alerts_cli_supports_date_override_and_system_actor(app):
         asset_id = cursor.lastrowid
         get_db().execute(
             """INSERT INTO software_licenses
-               (asset_id, product_name, expiry_date, renewal_status)
-               VALUES (?, 'CLI test license', '2026-11-21', 'active')""",
+               (asset_id, product_name, vendor, license_reference, entitlement_count,
+                used_count, expiry_date, renewal_status, notes)
+               VALUES (?, 'CLI test license', '', '', 1, 0, '2026-11-21', 'active', '')""",
             (asset_id,),
         )
         get_db().commit()
