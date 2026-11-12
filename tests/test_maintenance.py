@@ -288,3 +288,112 @@ def test_service_history_rows_are_immutable(client, app):
         connection.rollback()
     finally:
         connection.close()
+
+
+
+def test_maintenance_status_filter_returns_only_matching_schedules(client, app):
+    asset_id = add_asset(client)
+    create_schedule(client, asset_id, title="Scheduled inspection")
+    create_schedule(client, asset_id, title="Work to start")
+
+    connection = sqlite3.connect(app.config["DATABASE"])
+    maintenance_id = connection.execute(
+        "SELECT id FROM maintenance_schedules WHERE title=?",
+        ("Work to start",),
+    ).fetchone()[0]
+    connection.close()
+    assert post_form(client, f"/maintenance/{maintenance_id}/start").status_code == 302
+
+    scheduled = client.get("/maintenance?status=scheduled")
+    in_progress = client.get("/maintenance?status=in_progress")
+
+    assert scheduled.status_code == 200
+    assert b"Scheduled inspection" in scheduled.data
+    assert b"Work to start" not in scheduled.data
+    assert in_progress.status_code == 200
+    assert b"Work to start" in in_progress.data
+    assert b"Scheduled inspection" not in in_progress.data
+
+
+
+def test_invalid_maintenance_priority_is_rejected(client):
+    asset_id = add_asset(client)
+
+    response = create_schedule(client, asset_id, priority="urgent")
+
+    assert response.status_code == 400
+    assert b"Choose a valid priority." in response.data
+
+
+
+def test_future_service_date_is_rejected_without_completing_schedule(client, app):
+    asset_id = add_asset(client)
+    assert create_schedule(client, asset_id).status_code == 302
+
+    connection = sqlite3.connect(app.config["DATABASE"])
+    maintenance_id = connection.execute(
+        "SELECT id FROM maintenance_schedules WHERE asset_id=?", (asset_id,)
+    ).fetchone()[0]
+    connection.close()
+
+    tomorrow = (date.today() + timedelta(days=1)).isoformat()
+    response = post_form(
+        client,
+        f"/maintenance/{maintenance_id}/complete",
+        {
+            "service_date": tomorrow,
+            "performed_by": "Facilities technician",
+            "notes": "Inspection completed and device tested.",
+        },
+    )
+
+    assert response.status_code == 400
+    assert b"Service date cannot be in the future." in response.data
+
+    connection = sqlite3.connect(app.config["DATABASE"])
+    try:
+        status = connection.execute(
+            "SELECT status FROM maintenance_schedules WHERE id=?", (maintenance_id,)
+        ).fetchone()[0]
+        history_count = connection.execute(
+            "SELECT COUNT(*) FROM maintenance_service_history WHERE maintenance_id=?",
+            (maintenance_id,),
+        ).fetchone()[0]
+    finally:
+        connection.close()
+    assert status == "scheduled"
+    assert history_count == 0
+
+
+
+def test_completed_maintenance_cannot_be_completed_twice(client, app):
+    asset_id = add_asset(client)
+    assert create_schedule(client, asset_id).status_code == 302
+
+    connection = sqlite3.connect(app.config["DATABASE"])
+    maintenance_id = connection.execute(
+        "SELECT id FROM maintenance_schedules WHERE asset_id=?", (asset_id,)
+    ).fetchone()[0]
+    connection.close()
+
+    completion_path = f"/maintenance/{maintenance_id}/complete"
+    service_details = {
+        "service_date": date.today().isoformat(),
+        "performed_by": "Facilities technician",
+        "notes": "Replaced the cooling fan and verified operation.",
+    }
+    first_completion = post_form(client, completion_path, service_details)
+    second_completion = post_form(client, completion_path, service_details)
+
+    assert first_completion.status_code == 302
+    assert second_completion.status_code == 409
+
+    connection = sqlite3.connect(app.config["DATABASE"])
+    try:
+        history_count = connection.execute(
+            "SELECT COUNT(*) FROM maintenance_service_history WHERE maintenance_id=?",
+            (maintenance_id,),
+        ).fetchone()[0]
+    finally:
+        connection.close()
+    assert history_count == 1
