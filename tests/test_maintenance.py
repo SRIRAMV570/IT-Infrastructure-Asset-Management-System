@@ -363,3 +363,37 @@ def test_future_service_date_is_rejected_without_completing_schedule(client, app
         connection.close()
     assert status == "scheduled"
     assert history_count == 0
+
+
+
+def test_completed_maintenance_cannot_be_completed_twice(client, app):
+    asset_id = add_asset(client)
+    assert create_schedule(client, asset_id).status_code == 302
+
+    connection = sqlite3.connect(app.config["DATABASE"])
+    maintenance_id = connection.execute(
+        "SELECT id FROM maintenance_schedules WHERE asset_id=?", (asset_id,)
+    ).fetchone()[0]
+    connection.close()
+
+    completion_path = f"/maintenance/{maintenance_id}/complete"
+    service_details = {
+        "service_date": date.today().isoformat(),
+        "performed_by": "Facilities technician",
+        "notes": "Replaced the cooling fan and verified operation.",
+    }
+    first_completion = post_form(client, completion_path, service_details)
+    second_completion = post_form(client, completion_path, service_details)
+
+    assert first_completion.status_code == 302
+    assert second_completion.status_code == 409
+
+    connection = sqlite3.connect(app.config["DATABASE"])
+    try:
+        history_count = connection.execute(
+            "SELECT COUNT(*) FROM maintenance_service_history WHERE maintenance_id=?",
+            (maintenance_id,),
+        ).fetchone()[0]
+    finally:
+        connection.close()
+    assert history_count == 1
