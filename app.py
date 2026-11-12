@@ -530,6 +530,9 @@ def create_app(test_config=None):
         validate_asset, roles_required,
     )
 
+    # S2-04: reporting and validated CSV import/export.
+    from sprint2_reporting import register_reports
+    register_reports(app, get_db, roles_required, record_audit_event)
     # S2-01: register license and warranty management before alert generation.
     from license_warranty import register_license_warranty
     register_license_warranty(app, get_db, get_asset_or_404, roles_required, record_audit_event)
