@@ -313,3 +313,13 @@ def test_maintenance_status_filter_returns_only_matching_schedules(client, app):
     assert in_progress.status_code == 200
     assert b"Work to start" in in_progress.data
     assert b"Scheduled inspection" not in in_progress.data
+
+
+
+def test_invalid_maintenance_priority_is_rejected(client):
+    asset_id = add_asset(client)
+
+    response = create_schedule(client, asset_id, priority="urgent")
+
+    assert response.status_code == 400
+    assert b"Choose a valid priority." in response.data
