@@ -2,6 +2,7 @@
 
 **Owner:** @yashwanth00000  
 **Sprint:** November 5–11, 2026  
+**Handoff refresh:** November 12, 2026  
 **Feature branch:** \`feature/yashwanth-s2-maintenance-demo\`  
 **Scope:** S2-02 (5 points) and S2-06 (2 points)
 
@@ -41,7 +42,7 @@
 | ITAM-F-012/013 — Enforce manager write access | Existing server-side RBAC policy | \`test_read_only_employee_can_view_but_cannot_manage_maintenance\` |
 | ITAM-F-013 — Preserve service records after completion | SQLite no-UPDATE/no-DELETE triggers | \`test_service_history_rows_are_immutable\` |
 
-Run the full suite with \`python -m pytest -q\`. CI is authoritative for the pushed commit; do not record a local result unless the command has actually been run locally.
+Run the full suite with \`python -m pytest -q\`. CI is authoritative for the pushed commit; do not record a local result unless the command has actually been run locally. The latest workflow run for `main` at `afcad675454c6c15245d578bcf11f76c7359673f` completed successfully on 2026-11-12.
 
 ## S2-06 — Setup and operations guide
 
@@ -133,11 +134,11 @@ This table distinguishes work visible in \`main\` from work still in separate re
 | Sprint item | Owner | Evidence / current branch state | Release status |
 |---|---|---|---|
 | S2-01 — License and warranty records | Sharvesh | PR #9, \`feature/sharvesh-s2-license-warranty\` | In review; do not treat as part of \`main\` until merged |
-| S2-02 — Maintenance and service history | Yashwanth | This feature branch and maintenance regression tests | Implemented here; review and CI pending |
+| S2-02 — Maintenance and service history | Yashwanth | `maintenance.py`, maintenance templates and `tests/test_maintenance.py` are present in `main` | Integrated in `main`; latest full CI run passed |
 | S2-03 — Expiry and maintenance alerts | Shreyanganesh | Separate assigned backlog item | Not verified in \`main\` by this handoff |
 | S2-04 — Reports and CSV import/export | SRIRAMV570 | Separate assigned backlog item | Not verified in \`main\` by this handoff |
 | S2-05 — Security, performance and recovery checks | Sharvesh | Included in PR #9 | In review; review manual checks recorded in that handoff |
-| S2-06 — RTM, setup guide, demo and release freeze | Yashwanth | This handoff and demo run sheet | Documentation prepared; video and tag pending |
+| S2-06 — RTM, setup guide, demo and release freeze | Yashwanth | This handoff and demo run sheet in `main` | Documentation prepared; video and release tag still pending |
 
 ## Release freeze checklist
 
