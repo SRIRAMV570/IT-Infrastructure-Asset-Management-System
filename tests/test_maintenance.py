@@ -402,12 +402,12 @@ def test_completed_maintenance_cannot_be_completed_twice(client, app):
 def test_completed_maintenance_dashboard_count_increments_once(client, app):
     asset_id = add_asset(client)
     before = client.get("/").get_data(as_text=True)
-    assert re.search(r"Completed maintenance</span>\\s*<strong>0</strong>", before)
+    assert re.search(r"Completed maintenance</span>\s*<strong>0</strong>", before)
 
     created = create_schedule(client, asset_id)
     assert created.status_code == 302
     scheduled = client.get("/").get_data(as_text=True)
-    assert re.search(r"Scheduled maintenance</span>\\s*<strong>1</strong>", scheduled)
+    assert re.search(r"Scheduled maintenance</span>\s*<strong>1</strong>", scheduled)
 
     connection = sqlite3.connect(app.config["DATABASE"])
     try:
@@ -428,8 +428,8 @@ def test_completed_maintenance_dashboard_count_increments_once(client, app):
     )
     assert completed.status_code == 302
     dashboard = client.get("/").get_data(as_text=True)
-    assert re.search(r"Scheduled maintenance</span>\\s*<strong>0</strong>", dashboard)
-    assert re.search(r"Completed maintenance</span>\\s*<strong>1</strong>", dashboard)
+    assert re.search(r"Scheduled maintenance</span>\s*<strong>0</strong>", dashboard)
+    assert re.search(r"Completed maintenance</span>\s*<strong>1</strong>", dashboard)
 
     second = post_form(
         client,
@@ -442,4 +442,4 @@ def test_completed_maintenance_dashboard_count_increments_once(client, app):
     )
     assert second.status_code == 409
     dashboard_after = client.get("/").get_data(as_text=True)
-    assert re.search(r"Completed maintenance</span>\\s*<strong>1</strong>", dashboard_after)
+    assert re.search(r"Completed maintenance</span>\s*<strong>1</strong>", dashboard_after)
