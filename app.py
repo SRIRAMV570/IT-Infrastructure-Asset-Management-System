@@ -298,10 +298,21 @@ def create_app(test_config=None):
             ORDER BY category COLLATE NOCASE
             """
         ).fetchall()
+        maintenance_counts = {
+            row["status"]: row["count"]
+            for row in db.execute(
+                "SELECT status, COUNT(*) AS count "
+                "FROM maintenance_schedules GROUP BY status"
+            )
+        }
         return render_template(
             "index.html",
             counts={status: counts.get(status, 0) for status in ASSET_STATUSES},
             category_counts=category_counts,
+            maintenance_counts={
+                status: maintenance_counts.get(status, 0)
+                for status in ("scheduled", "in_progress", "completed")
+            },
             total=sum(counts.values()),
         )
 
