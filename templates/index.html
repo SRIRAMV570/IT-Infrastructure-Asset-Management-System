@@ -23,6 +23,24 @@
     {% endfor %}
   </section>
 
+  <section class="panel" aria-label="Maintenance summary">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">Service activity</p>
+        <h2>Maintenance overview</h2>
+      </div>
+      <a class="text-link" href="{{ url_for('maintenance_list') }}">View maintenance history</a>
+    </div>
+    <div class="stat-grid">
+      {% for status, count in maintenance_counts.items() %}
+        <a class="stat-card" href="{{ url_for('maintenance_list', status=status) }}">
+          <span class="muted">{{ status|replace("_", " ")|title }} maintenance</span>
+          <strong>{{ count }}</strong>
+        </a>
+      {% endfor %}
+    </div>
+  </section>
+
   <section class="dashboard-grid" aria-label="Inventory summaries">
     <article class="panel summary-panel">
       <div class="section-heading">
