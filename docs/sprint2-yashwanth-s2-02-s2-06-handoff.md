@@ -2,7 +2,7 @@
 
 **Owner:** @yashwanth00000  
 **Sprint:** November 5–11, 2026  
-**Handoff refresh:** November 12, 2026  
+**Handoff refresh:** November 20, 2026  
 **Feature branch:** \`feature/yashwanth-s2-maintenance-demo\`  
 **Scope:** S2-02 (5 points) and S2-06 (2 points)
 
@@ -42,7 +42,7 @@
 | ITAM-F-012/013 — Enforce manager write access | Existing server-side RBAC policy | \`test_read_only_employee_can_view_but_cannot_manage_maintenance\` |
 | ITAM-F-013 — Preserve service records after completion | SQLite no-UPDATE/no-DELETE triggers | \`test_service_history_rows_are_immutable\` |
 
-Run the full suite with \`python -m pytest -q\`. CI is authoritative for the pushed commit; do not record a local result unless the command has actually been run locally. The latest workflow run for `main` at `afcad675454c6c15245d578bcf11f76c7359673f` completed successfully on 2026-11-12.
+Run the full suite with \`python -m pytest -q\`. CI is authoritative for the pushed commit; do not record a local result unless the command has actually been run locally. The release commit `fd77b3a04168468508fc01c24bae7e032ae88f70` passed the GitHub Actions `Tests` workflow on 2026-11-20. See [the successful run](https://github.com/SRIRAMV570/IT-Infrastructure-Asset-Management-System/actions/runs/44704168833).
 
 ## S2-06 — Setup and operations guide
 
@@ -98,7 +98,7 @@ python scripts/sqlite_backup.py restore backups/itams-backup.sqlite3 instance/it
 python scripts/sqlite_backup.py verify instance/itams-restore-test.sqlite3
 \`\`\`
 
-Until PR #9 is merged, a portable Python standard-library backup can be made without the helper script:
+If the helper script is unavailable in a particular checkout, a portable Python standard-library backup can be made without it:
 
 \`\`\`powershell
 python -c "import sqlite3; src=sqlite3.connect('instance/itams.sqlite3'); dst=sqlite3.connect('backups/itams-backup.sqlite3'); src.backup(dst); dst.close(); src.close()"
@@ -125,30 +125,31 @@ Both integrity checks should print \`ok\`. Keep backups outside version control 
 | 1:20–1:45 | Start the work, record the service date, technician and notes, then complete the schedule. |
 | 1:45–2:00 | Show the linked service-history entry and explain that completed service events cannot be edited or deleted through normal SQL operations. |
 
-**Recording status:** The run sheet is ready, but an actual two-minute screen recording has not been captured or uploaded in this change because a live browser session and demo operator are required. A teammate should record the running application with synthetic data and attach the video before release sign-off.
+**Recording status (optional):** The run sheet is provided as a suggested walkthrough. No screen recording is claimed to have been captured or uploaded. Recording is optional unless faculty or the course submission instructions explicitly require a video. If requested, record the running application with synthetic data; do not include real credentials or personal data.
 
 ## Sprint 2 release traceability snapshot
 
-This table distinguishes work visible in \`main\` from work still in separate review branches at the time this handoff was prepared (November 11, 2026).
+This table reflects the repository state verified on November 20, 2026. The listed feature and handoff pull requests are merged into `main`.
 
-| Sprint item | Owner | Evidence / current branch state | Release status |
+| Sprint item | Owner | Evidence | Release status |
 |---|---|---|---|
-| S2-01 — License and warranty records | Sharvesh | PR #9, \`feature/sharvesh-s2-license-warranty\` | In review; do not treat as part of \`main\` until merged |
-| S2-02 — Maintenance and service history | Yashwanth | `maintenance.py`, maintenance templates and `tests/test_maintenance.py` are present in `main` | Integrated in `main`; latest full CI run passed |
-| S2-03 — Expiry and maintenance alerts | Shreyanganesh | Separate assigned backlog item | Not verified in \`main\` by this handoff |
-| S2-04 — Reports and CSV import/export | SRIRAMV570 | Separate assigned backlog item | Not verified in \`main\` by this handoff |
-| S2-05 — Security, performance and recovery checks | Sharvesh | Included in PR #9 | In review; review manual checks recorded in that handoff |
-| S2-06 — RTM, setup guide, demo and release freeze | Yashwanth | This handoff and demo run sheet in `main` | Documentation prepared; video and release tag still pending |
+| S2-01 — License and warranty records | Sharvesh | PR #9; `license_warranty.py` and related tests | Merged into `main` |
+| S2-02 — Maintenance and service history | Yashwanth | PRs #10, #13, #14; `maintenance.py`, templates and tests | Merged into `main`; dashboard completion counter follow-up in PR #15 |
+| S2-03 — Expiry and maintenance alerts | Shreyanganesh | PR #11; `alerts.py`, alert templates and tests | Merged into `main` |
+| S2-04 — Reports and CSV import/export | SRI RAM V | PR #12; reports and validated CSV import/export | Merged into `main` |
+| S2-05 — Security, performance and recovery checks | Sharvesh | PR #9; security/quality tests and SQLite backup/restore utility | Merged into `main`; manual compatibility and representative-environment restore checks should still be completed if required |
+| S2-06 — RTM, setup guide, demo and release freeze | Yashwanth | PRs #10 and #13; this handoff | Documentation integrated; `v1.0.0` published. Recording is optional unless requested by faculty |
 
-## Release freeze checklist
+## Release freeze and post-release checklist
 
-- [x] Add S2-02 automated regression tests and traceability mapping.
+- [x] Integrate the assigned Sprint 2 feature PRs into `main` after review and CI.
+- [x] Add maintenance regression tests, dashboard maintenance completion-count coverage and traceability.
 - [x] Document setup, secret configuration, database location, and safe backup/restore steps.
-- [x] Prepare the two-minute demo run sheet.
-- [ ] Obtain teammate approval and passing CI for this PR.
-- [ ] Merge the remaining Sprint 2 feature PRs (S2-01, S2-03, S2-04 and S2-05) after their review and CI.
-- [ ] Run final full-suite regression on the combined \`main\` branch and complete the manual browser/restore checks.
-- [ ] Record and upload the actual two-minute demo video.
-- [ ] Create the agreed release tag and freeze further feature changes.
+- [x] Prepare the optional two-minute demo run sheet.
+- [x] Publish the immutable `v1.0.0` release tag on commit `fd77b3a04168468508fc01c24bae7e032ae88f70`.
+- [x] Verify the GitHub Actions Tests workflow passed for the release commit.
+- [ ] Complete a manual browser-based end-to-end walkthrough and record its outcome. A video recording is optional unless faculty explicitly requires it.
+- [ ] Confirm `main` branch protection in repository Settings. The GitHub integration used for this documentation update could not read the branch-protection endpoint, so no protection status is claimed here.
+- [ ] If documentation corrections are approved, merge them as a post-release follow-up commit/PR. Do not move, delete, or recreate `v1.0.0`.
 
-**Release decision:** Do not tag or declare the Sprint 2 build frozen yet. The project still has teammate-owned Sprint 2 items and a demo recording outstanding. Freeze only after the checklist above is completed and the team approves any remaining deferrals.
+**Release decision:** `v1.0.0` is the fixed faculty-submission snapshot. Its tag must remain unchanged. The README and this handoff are being corrected on a separate documentation branch after the release; merging those corrections will advance `main` but will not alter the tagged submission commit. Manual browser verification and branch-protection confirmation remain separate sign-off checks. The actual demo video is optional unless faculty or the course instructions require it.
