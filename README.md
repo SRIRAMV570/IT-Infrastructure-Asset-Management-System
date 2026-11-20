@@ -167,8 +167,7 @@ python -m pytest -q
 
 ## Current Implementation
 
-The current application supports authenticated asset registration, editing, inventory search and status filtering, allocation, transfer, return, retirement, allocation history, and an append-only audit trail for asset lifecycle changes. It also includes software license records with entitlement and usage tracking, asset-linked warranty coverage, over-entitlement flags, maintenance scheduling and service history, and alert generation, acknowledgement, assignment and resolution. License activation keys and credentials are not stored. Reporting and CSV import/export remain separate Sprint 2 work. Role-based authorization and CSRF protection are enforced on mutating routes. This prototype remains intended for local development and evaluation; configure production-grade deployment security before exposing it to an untrusted network.
-7. Verify login, asset creation, allocation, expiry alerts, and reporting.
+The current application supports authenticated asset registration and editing, inventory search and status filtering, allocation, transfer, return, retirement, allocation history, and an append-only audit trail for asset lifecycle changes. Sprint 2 functionality integrated into `main` includes software license records with entitlement and usage tracking, asset-linked warranty coverage, over-entitlement flags, maintenance scheduling and immutable service history, alert generation and lifecycle management (acknowledge, assign and resolve), inventory reports, and validated CSV import/export. CSV imports validate the upload and reject invalid batches atomically; successful writes are integrated with allocation and audit records. License activation keys and credentials are not stored. Role-based authorization and CSRF protection are enforced on mutating routes. The repository includes automated pytest coverage and a GitHub Actions workflow; see the Actions page for the latest run. This prototype remains intended for local development and evaluation; configure production-grade deployment security before exposing it to an untrusted network.
 
 Do not commit passwords, API keys, database credentials, or other secrets to version control.
 
@@ -179,9 +178,11 @@ Do not commit passwords, API keys, database credentials, or other secrets to ver
 - **Yashwanth**
 - **Shreyan Ganesh**
 
-## Project Status
+## Project Status and Release
 
-The SRS, SAD, and test plan describe the broader target system. Keep implementation and test status up to date as additional features are developed.
+The Sprint 1 and Sprint 2 feature pull requests have been integrated into `main`. The published `v1.0.0` release is the fixed faculty-submission snapshot and must remain unchanged. Subsequent documentation-only corrections or approved maintenance fixes belong in new commits after the tag; do not move, delete, or recreate `v1.0.0`.
+
+Automated CI has passed on the commit referenced by `v1.0.0`. This does not replace manual browser-based user acceptance testing or a live faculty demonstration. The two-minute demo run sheet is optional preparation guidance; an actual screen recording is optional unless the course/faculty explicitly requires one. See `docs/sprint2-yashwanth-s2-02-s2-06-handoff.md` for release handoff details and remaining verification notes.
 
 ## License
 
